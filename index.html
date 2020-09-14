@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
 <head>
+<script type="text/javascript" src="js/video.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kevin Lin's Website</title>
@@ -41,7 +42,19 @@ body, html {
 
   /* Full height */
   min-height: 30%; 
+margin-top:1cm;
+  /* Create the parallax scrolling effect */
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+	}
+	.parallax4 {
+ 
 
+  /* Full height */
+  min-height: 30%; 
+margin-top:1cm;
   /* Create the parallax scrolling effect */
   background-attachment: fixed;
   background-position: center;
@@ -55,7 +68,6 @@ body, html {
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
-	margin-top: 2cm;
 	}
 	.caption {
 	position: absolute;
@@ -186,67 +198,72 @@ body, html {
     <hr class="sectionTitleRule">
 	  
     <hr class="sectionTitleRule2">
-	  <div class="project"> <a href="https://www.youtube.com/watch?v=8PibzdrK5q4" target="_blank"><img src="robot.png" alt="Robot Summer Picture" width="196" height="195" align = "left"/></a>
+	  <div class="project"> <a href="https://www.youtube.com/watch?v=8PibzdrK5q4" target="_blank"><img src="robot.png" alt="Robot Summer Picture" width="179" height="180" align = "left"/></a>
     <article class="section2Content">
 		
       <h2 class="sectionContentTitle">ENPH Robot Summer 2020</h2>
-      <h3 class="sectionContentSubTitle">Mechanical/Circuit Design, Soldering, STM-32 BluePill, C++ PID Software | May - August 2020</h3>
+      <h3 class="sectionContentSubTitle">Onshape, Circuit Design, Soldering, STM-32 BluePill, C++ PID Software | May - August 2020</h3>
       <p class="sectionContent"> Every year, Engineering Physics has a robot summer course where a robot is built to achieve a goal in a competition with classmates in teams of 4. Our cohort's competition was at home because of COVID-19, so we picked up electronics from the university and bought tools/materials to make our robot. I learned to design and solder circuits, write tape-following PID software in C++, use various sensors/motors, and construct a chassis using hot glue and plastic. Click the image for my cool robot video, and <a href="https://s3-us-west-2.amazonaws.com/kevinlinxc.com/Design+Summary.pdf">here</a> for some more design/competition details.</p>
     </article>
 	</div>
-	  <div class="project"> <a href="https://github.com/kevinlinxc/PlayBarnesBot" target="_blank"><img src="barnes.png" width="180" height="180" alt="PlayBarnesBot Picture" align = "left"/></a>
+	  <div class="project"> <a href="https://github.com/kevinlinxc/PlayBarnesBot" target="_blank"><img src="pen.png" width="180" height="180" alt="PlayBarnesBot Picture" align = "left"/></a>
     <article class="section2Content">
 		
-      <h2 class="sectionContentTitle">PlayBarnesBot</h2>
-      <h3 class="sectionContentSubTitle">Python, Tweepy, Pytrends, AWS Lambda | January 2020</h3>
-		<p class="sectionContent"> In the video game Hearthstone, there is a card named Barnes that summons other creatures. A content creator that I enjoy watching popularized the catchphrase "I play Barnes and I summon ___". I decided to make a Twitter bot that finishes the phrase in daily tweets using words from Google Trends, Cards Against Humanity cards, and some custom words. To automate the script to run daily, I learned to use Amazon Web Services (AWS).</p>
+      <h2 class="sectionContentTitle">Tablet Pen</h2>
+      <h3 class="sectionContentSubTitle">Solidworks | December 2019</h3>
+		<p class="sectionContent"> The tablet that I use to take notes came with a very small stylus, about the size of a Nintendo DS stylus. I decided I wanted to modify to be more ergonomic and easier to hold. I experimented with a few pen bodies, and then designed and 3D printed an insert that lets the stylus  </p>
     </article>
 	</div>
-	  <div class="project"> <a href="https://github.com/kevinlinxc/GuitarAutoscroll" target="_blank"><img  src="Android studio.png" width="180" height="180" alt="Guitar AutoScroll Picture" align = "left"/></a>
-    <article class="section2Content">
-		
-      <h2 class="sectionContentTitle">Guitar Autoscroll</h2>
-      <h3 class="sectionContentSubTitle">Java, Android Studio | November 2019</h3>
-		<p class="sectionContent"> While learning to play the guitar, I was frustrated that the automatic scrolling of guitar tabs (sheet music) was locked behind a paywall on some popular websites and applications. Using the experience from my internship, I made my own app that could take pictures and scroll through them at a modifiable speed. I didn't learn to optimize applications, so I never made more than a prototype on my phone, and I decided not to release the app. </p>
-    </article>
-	</div>
-	  <div class="project"> <a href="https://github.com/kevinlinxc/NurseAnnieBot" target="_blank"><img  src="nurseannie.png" width="180" height="180" alt="NurseAnnieBot Picture" align = "left"/></a>
-    <article class="section2Content">
-		
-      <h2 class="sectionContentTitle">NurseAnnieBot</h2>
-      <h3 class="sectionContentSubTitle">Python, Numpy, OpenCV | July 2019</h3>
-		<p class="sectionContent"> Another content creator that I follow made a simple video game in which you have to recognize specific inputs and respond with your own keyboard inputs. I used some basic computer vision to automate playing of the game as an exercise and a minor introduction to computer vision. I plan on attempting another computer vision project soon, since this project only had basic color matching. </p>
-    </article>
-	</div>
-	 
+  </section>
+	 </section>
+	
+	
+	<div class = "parallax4">
+		<video  autobuffer preload muted height = "240" width = "50%" id = "myVideo">
+
+			<source src = "canucks2.mp4" type = "video/mp4">
+			Canucks Video
+		</video>
+	  <div class = "caption"> 
+		<span class="border" >MOTION GRAPHICS</span>
+	  </div>
+</div>
+
+	<section class="mainContent"> 
+  
+  <section class="section2">
+	
 	  
+    <hr class="sectionTitleRule">
+	  
+    <hr class="sectionTitleRule2">
+	  <div class="project"> <a href="https://www.youtube.com/watch?v=8PibzdrK5q4" target="_blank"><img src="robot.png" alt="Robot Summer Picture" width="179" height="180" align = "left"/></a>
+    <article class="section2Content">
+		
+      <h2 class="sectionContentTitle">ENPH Robot Summer 2020</h2>
+      <h3 class="sectionContentSubTitle">Onshape, Circuit Design, Soldering, STM-32 BluePill, C++ PID Software | May - August 2020</h3>
+      <p class="sectionContent"> Every year, Engineering Physics has a robot summer course where a robot is built to achieve a goal in a competition with classmates in teams of 4. Our cohort's competition was at home because of COVID-19, so we picked up electronics from the university and bought tools/materials to make our robot. I learned to design and solder circuits, write tape-following PID software in C++, use various sensors/motors, and construct a chassis using hot glue and plastic. Click the image for my cool robot video, and <a href="https://s3-us-west-2.amazonaws.com/kevinlinxc.com/Design+Summary.pdf">here</a> for some more design/competition details.</p>
+    </article>
+	</div>
+	  <div class="project"> <a href="https://github.com/kevinlinxc/PlayBarnesBot" target="_blank"><img src="pen.png" width="180" height="180" alt="PlayBarnesBot Picture" align = "left"/></a>
+    <article class="section2Content">
+		
+      <h2 class="sectionContentTitle">Tablet Pen</h2>
+      <h3 class="sectionContentSubTitle">Solidworks | December 2019</h3>
+		<p class="sectionContent"> The tablet that I use to take notes came with a very small stylus, about the size of a Nintendo DS stylus. I decided I wanted to modify to be more ergonomic and easier to hold. I experimented with a few pen bodies, and then designed and 3D printed an insert that lets the stylus  </p>
+    </article>
+	</div>
   </section>
   <!-- Previous experience details -->
 	
-  <section style = "margin-top:3cm;" class="section2">
-    <h2 class="sectionTitle">Content Holder 2</h2>
-    <hr class="sectionTitleRule">
-    <hr class="sectionTitleRule2">
-    <!-- First Title & company details  -->
-    <article class="section2Content">
-      <h2 class="sectionContentTitle">Title & Company</h2>
-      <h3 class="sectionContentSubTitle">Position / Date - Year</h3>
-      <p class="sectionContent"> Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. </p>
-    </article>
-    <!-- Second Title & company details  -->
-    <article class="section2Content">
-      <h2 class="sectionContentTitle"> Title & Company</h2>
-      <h3 class="sectionContentSubTitle">Position / Date - Year</h3>
-      <p class="sectionContent"> Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. </p>
-    </article>
-    <!-- Replicate the above Div block to add more title and company details --> 
-  </section>
+  
   <!-- Links to expore your past projects and download your CV -->
   <aside class="externalResourcesNav">
     <div class="externalResources"> <a href="https://s3-us-west-2.amazonaws.com/kevinlinxc.com/Kevin+Lin+Resume.pdf" title="Download CV Link">DOWNLOAD CV</a> </div>
     <span class="stretch"></span>
   </aside>
 </section>
+	
 <footer>
   <hr>
   <p class="footerDisclaimer">Kevin Lin - <span>All Rights Reserved</span></p>
