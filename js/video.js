@@ -3,7 +3,7 @@ var vid = document.getElementById('myVideo');
 //var vid = $('#v0')[0]; // jquery option
 
 // pause video on load
-vid.pause();
+//vid.pause();
  
 // pause video on document scroll (stops autoplay once scroll started)
 window.onscroll = function(){
