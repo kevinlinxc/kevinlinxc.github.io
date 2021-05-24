@@ -1,0 +1,20 @@
+section:
+  name: Achievements
+  id: achievements
+  enable: true
+  weight: 6
+  showOnNavbar: true
+  # Can optionally hide the title in sections
+  # hideTitle: true
+
+# Your achievements achievements
+achievements:
+- title: City of Burnaby Youth Environmental Award 2018
+  image: images/achievements/city of burnaby environmental award.jpg
+  summary: I was presented this award for my outstanding leadership and environmental achievements, namely a successful campaign to make sugarcane-based paper available in BC and bee conservation efforts.
+- title: BC Hydro-Engineers and Geoscientists BC Foundation Scholarship
+  image: images/achievements/logo.jpg
+  summary: I was awarded this scholarship in early 2020 for my academic performance and community involvement.
+- title: BC Hydro Power Pioneer's Community Service Award
+  image: images/achievements/logo2.jpg
+  summary: For my accelerated solar energy permitting advocacy across the Lower Mainland, I was awarded this scholarship in May of 2018.

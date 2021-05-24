@@ -1,0 +1,45 @@
+# section information
+section:
+  name: Design Teams
+  id: designteams
+  enable: true
+  weight: 4
+  showOnNavbar: true
+  # Can optionally hide the title in sections
+  # hideTitle: true 
+
+# Your experiences
+experiences:
+- company:
+    name: UBC Snowbots
+    url: "snowbots.ca"
+    location: Vancouver, British Columbia, Canada
+    # company overview
+    overview: UBC Snowbots is UBC's multidisciplinary rover design team, specializing in autonomous vehicles similar to those meant for space exploration. Snowbots competes in the Canadian International Rover Challenge.
+  positions:
+  - designation: Systems Integration Lead, Software Team Member
+    start: September 2018
+    end: Present
+    # don't provide end date if you are currently working there. It will be replaced by "Present"
+    # end: Dec 2020
+    # give some points about what was your responsibilities at the company.
+    responsibilities:
+    - Worked with the 20+ member interdisciplinary design team making an autonomous rover for national competitions
+    - Used a Ubuntu environment with C++ to interface a gaming controller with rover ROS software
+    - Used Github to commit code, organize work, and perform code reviews with other software team members
+    - Troubleshooted routers with OpenWRT firmware to increase signal distance by 1km
+
+- company:
+    name: UBC AeroDesign
+    url: "http://ubcaerodesign.com/"
+    location: Vancouver, British Columbia, Canada
+    overview: UBC AeroDesign is an engineering student team at the University of British Columbia. The team designs, builds, and flies payload-lifting, radio-controlled fixed-wing airplanes to compete in the international SAE Aero Design Collegiate Series.
+  positions:
+  - designation: Avionics Team Member
+    start: September 2020
+    end: Present
+    responsibilities:
+    - Implemented real-time data visualization of avionics data on ground station website using React/JavaScript
+    - Implemented temporary fake avionics data generation using plane simulation to replace sensors that were unavail-able due to COVID-19
+    - Tutored new teammates on Android Studio, Git, and Javascript practices
+    - Participated in design discussions to improve communication between our plane and the ground station computer

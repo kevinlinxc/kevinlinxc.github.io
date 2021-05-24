@@ -1,0 +1,61 @@
+# section information
+section:
+  name: Jobs
+  id: experiences
+  enable: true
+  weight: 3
+  showOnNavbar: true
+  # Can optionally hide the title in sections
+  # hideTitle: true 
+
+# Your experiences
+experiences:
+- company:
+    name: Sauce Labs
+    url: "https://www.saucelabs.com"
+    location: Vancouver, British Columbia, Canada
+    # company overview
+    overview: Sauce Labs provides live, automated and continuous testing for web & mobile
+      apps on the world's largest cloud-based test platform. Their goal is to ensure digital confidence in their customer's products.
+  positions:
+  - designation: Software Engineer Intern
+    start: May 2021
+    end: December 2021
+    # don't provide end date if you are currently working there. It will be replaced by "Present"
+    # end: Dec 2020
+    # give some points about what was your responsibilities at the company.
+    responsibilities:
+    - Became an integrated member of the Virtual Desktop Cloud team, which focuses on providing browser and operating system combinations for desktop testing
+    - Played an instrumental role in integrating the support of Selenium 4 to Sauce Labs
+    - Investigated and fixed browser webdriver acquisition bugs in Sauce Labs' Python codebase
+    - Used Agile/team tools like Jira, Confluence, Fellow, Slack, Zoom to communicate across the 500+ employee company.
+
+- company:
+    name: SNOLAB
+    url: "https://www.snolab.ca/"
+    location: Sudbury, Ontario, Canada
+    overview: SNOLAB is Canada’s deep underground research laboratory, located in Vale’s Creighton mine, specializing in neutrino and dark matter research.
+  positions:
+  - designation: Student Research Assistant
+    start: February 2020
+    end: May 2020
+    responsibilities:
+    - Utilized C++ and ROOT (CERN data language) to analyze a neutrino detector’s radon monitor data
+    - Wrote engineering documentation for an industrial-scale Radon gas reduction system
+    - Calculated radon emanation rate of underground lab walls and floors using an acrylic chamber
+    - Wrote a Medium.com article explaining Neutrinoless Double Beta Decay, a complicated physics phenomena
+
+- company:
+    name: Game of Apps
+    url: "https://gameofapps.org/"
+    location: Richmond, British Columbia, Canada
+    overview: At Game of Apps, local Tech professionals work with students weekly to teach them the skills and principles used in the industry as they build their own apps. 
+  positions:
+  - designation: Software Developer Intern
+    start: July 2019
+    end: August 2019
+    responsibilities:
+    - Collaborated with 14 designers and developers on an app that teaches mobile app design to high schoolers
+    - Used Java in Android Studio, created user profile, learning quizzes, credits, and fixed existing bugs
+    - Used Git with Bitbucket as a version control tool, and Firebase as a backend
+    - Oversaw subteam of 3 developers + 1 designer and communicated with team using Slack, Trello, and Miro
