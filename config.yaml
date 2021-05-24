@@ -24,7 +24,7 @@ enableEmoji: true
 # Site parameters
 params:
   # GitHub repo URL of your site
-  gitRepo: https://github.com/hugo-toha/hugo-toha.github.io
+  gitRepo: https://github.com/kevinlinxc/kevinlinxc.github.io
 
   # specify whether you want to write some blog posts or not
   enableBlogPost: false
