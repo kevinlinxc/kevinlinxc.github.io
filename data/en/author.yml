@@ -1,0 +1,18 @@
+# some information about you
+name: "Kevin Lin"
+nickname: "Kevin"
+# greeting message before your name. it will default to "Hi! I am" if not provided
+greeting: "Hi, I'm"
+image: "images/author/pfp.png"
+# give your some contact information. they will be used in the footer
+contactInfo:
+  email: "kevinlinxc@gmail.com"
+  phone: "(604)-349-9438"
+
+# some summary about what you do
+summary:
+  - I am a 3rd year Engineering Physics Student
+  - I am a Software Developer Intern at Sauce Labs
+  - I am a video and photo editing guru
+  - I enjoy photography and have tried to take stock photos
+  - I play piano and alto sax!

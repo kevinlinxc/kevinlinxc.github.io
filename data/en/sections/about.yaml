@@ -1,0 +1,57 @@
+# section information
+section:
+  name: About
+  id: about
+  enable: true
+  weight: 1
+  showOnNavbar: true
+  template: sections/about.html
+
+# your designation
+designation: Engineering Physics | Software Developer Intern
+# your company information
+company:
+  name: Sauce Labs
+  url: "saucelabs.com"
+
+# your resume. this file path should be relative to you "static" directory
+resume: "files/resume.pdf"
+
+# a summary about you
+summary: "Hi, my name is Kevin and I am currently studying Engineering Physics at UBC. In my spare time, I make creative videos, take stock pictures, 
+game with friends, play piano/saxophone, and work on personal coding projects.  Check out my socials below or keep scrolling for more info on my hobbies and projects!"
+
+# your social links
+# give as many as you want. use font-awesome for the icons.
+socialLinks:
+- name: Github
+  icon: "fab fa-github"
+  url: "https://github.com/kevinlinxc"
+- name: LinkedIn
+  icon: "fab fa-linkedin"
+  url: "https://www.linkedin.com/in/kevinlinxc/"
+- name: YouTube
+  icon: "fab fa-youtube"
+  url: "https://www.youtube.com/pythagorasprobably"
+# your soft skills
+# give the percentage between 50 to 100 with 5 intervals.
+# currently supported colors: blue, yellow, pink, green, sky, orange
+softSkills:
+- name: Python
+  percentage: 100
+  color: blue
+- name: JavaScript
+  percentage: 100
+  color: yellow
+- name: Java
+  percentage: 100
+  color: cyan
+- name: Video Editing
+  percentage: 100
+  color: orange
+- name:  Writing
+  percentage: 100
+  color: pink
+- name: Android Dev
+  percentage: 100
+  color: green
