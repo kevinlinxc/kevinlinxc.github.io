@@ -43,7 +43,7 @@ projects:
 
 - name: Engineering Physics Robot Summer 2020
   logo: images/projects/robot.png
-  role: Creator
+  role: Team Member
   timeline: "May 2020 - August 2020"
   url: https://www.youtube.com/watch?v=8PibzdrK5q4
   summary: Every year, Engineering Physics has a robot summer course where a robot is built to achieve a goal in a competition with classmates in teams of 4. Our cohort's competition was at home because of COVID-19, so we picked up electronics from the university and bought tools/materials to make our robot. I learned to design and solder circuits, write tape-following PID software in C++, use various sensors/motors, and construct a chassis using hot glue and plastic. Click for a YouTube video I made.
