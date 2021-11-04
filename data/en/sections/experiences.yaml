@@ -26,9 +26,10 @@ experiences:
     # give some points about what was your responsibilities at the company.
     responsibilities:
     - Became an integrated member of the Virtual Desktop Cloud team, which focuses on providing browser and operating system combinations for desktop testing
-    - Played an instrumental role in integrating the support of Selenium 4 to Sauce Labs
-    - Investigated and fixed browser webdriver acquisition bugs in Sauce Labs' Python codebase
-    - Used Agile/team tools like Jira, Confluence, Fellow, Slack, Zoom to communicate across the 500+ employee company.
+    - Shipped Selenium 4 compatibility for Sauce Labs from Jira epic to production deployment
+    - Won an internal hackthon with a fully functional Gitlab CI Pipeline user interface and supporting promotional video
+    - Used Python, Google Cloud Platform, Kubernetes, Gitlab CI, Jenkins, macOS command line tools and more to implement fixes and features
+    - Used Agile/team tools like Jira, Confluence, Fellow, Slack, Zoom, Retrium and more to communicate across the 500+ employee nascent company
 
 - company:
     name: SNOLAB
@@ -40,8 +41,8 @@ experiences:
     start: February 2020
     end: May 2020
     responsibilities:
-    - Utilized C++ and ROOT (CERN data language) to analyze a neutrino detector’s radon monitor data
-    - Wrote engineering documentation for an industrial-scale Radon gas reduction system
+    - Utilized C++ and ROOT (CERN data language) to create data visualizaiton scripts for a neutrino detector’s radon monitor data
+    - Wrote engineering documentation (FMEA, Control Strategy ) for an industrial-scale Radon gas reduction system
     - Calculated radon emanation rate of underground lab walls and floors using an acrylic chamber
     - Wrote a Medium.com article explaining Neutrinoless Double Beta Decay, a complicated physics phenomena
 
