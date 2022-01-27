@@ -23,6 +23,31 @@ buttons:
 
 # your projects
 projects:
+- name: QuickFormula
+  role: Creator
+  timeline: "Present"
+  repo: https://github.com/kevinlinxc/quickformula
+  #url: ""
+  summary: My most promising project so far, and a work in progress. My goal is to aggregate all Engineering/STEM formulas into a modern site with a search function to make the process of looking for a common formula take seconds. Currently, I look for formuals in textbooks and on Google, and the fact that a good site doesn't exist yet (that I know of) is mind boggling.
+  tags: ["Personal", "Software", "ReactJS"]
+
+- name: Video Editing
+  logo: images/projects/premiere.png
+  role: Creator
+  timeline: "2018-Present"
+  url: https://www.youtube.com/channel/UCZplCgpmfT4CgColf2nab0w
+  summary: I've done video editing and motion graphics since 2018, making gaming videos and competing in UBC Engineering's annual filmfests. On YouTube, I've amassed around half a million views and 1500 subscribers. This skill has proven useful in this era as the ability to create engaging visuals, static or dynamic, is useful in pretty much every project.
+  tags: ["Personal"]
+
+- name: DeSynthesia
+  logo: images/projects/keys.jpg
+  role: Creator
+  timeline: "Aug 2021"
+  repo: C:\Users\Kevin\Documents\kevinlinxc.github.io\assets\images\author # If your project is a public repo on GitHub, then provide this link. it will show star count.
+  #url: ""  # If your project is not a public repo but it has a website or any external details url then provide it here. don't provide "repo" and "url" simultaneously.
+  summary: DeSynthesia uses OpenCV and MIDIUtil to convert YouTube videos of piano tutorials into sheet music. It successfully detects notes and the timing of the notes, but fails in the MIDI to Sheet Music step (handled by MuseScore), as the output lacks the quality of life changes a human writing sheet music would make. It is a response to the terrible sheet music industry that tries to enforce archaic pricing models.
+  tags: ["Personal", "Software", "Python", "Computer Vision"]
+
 - name: OmenBot
   logo: images/projects/omenbot.png
   role: Creator
@@ -38,7 +63,7 @@ projects:
   timeline: "April 2021"
   repo: https://github.com/kevinlinxc/xkcdrandomizer
   #url: ""
-  summary: Cuts up the well known XKCD comics uses Kumiko, randomly puts them back together, and automatically posts them on Twitter using AWS Lambda and Serverless. 
+  summary: Cuts up the well known XKCD comics using Kumiko, randomly puts them back together, and automatically posts them on Twitter using AWS Lambda and Serverless, similar to PlayBarnesBot.
   tags: ["Personal", "Software", "Python"]
 
 - name: Engineering Physics Robot Summer 2020

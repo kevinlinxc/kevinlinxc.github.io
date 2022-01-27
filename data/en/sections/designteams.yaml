@@ -11,6 +11,21 @@ section:
 # Your experiences
 designteams:
 - company:
+    name: UBC AeroDesign
+    url: "http://ubcaerodesign.com/"
+    location: Vancouver, British Columbia, Canada
+    overview: UBC AeroDesign is an engineering student team at the University of British Columbia. The team designs, builds, and flies payload-lifting, radio-controlled fixed-wing airplanes to compete in the international SAE Aero Design Competition.
+  positions:
+  - designation: Avionics Team Member
+    start: September 2020
+    responsibilities:
+    - Implemented real-time data visualization of avionics data on ground station website using React/JavaScript
+    - Overhauled existing flight data acquisition pipeline in favour of a streamlined Python application
+    - Tutored new teammates on Android Studio, Git, and Javascript practices
+    - Used OpenCV to rapidly prototype plane-mounted camera's detection of landing circles
+    - Participated in design discussions to improve communication between our plane and the ground station computer
+
+- company:
     name: UBC Snowbots
     url: "snowbots.ca"
     location: Vancouver, British Columbia, Canada
@@ -19,27 +34,13 @@ designteams:
   positions:
   - designation: Systems Integration Lead, Software Team Member
     start: September 2018
-    end: Present
+    end: September 2021
     # don't provide end date if you are currently working there. It will be replaced by "Present"
     # end: Dec 2020
     # give some points about what was your responsibilities at the company.
     responsibilities:
     - Worked with the 20+ member interdisciplinary design team making an autonomous rover for national competitions
-    - Used a Ubuntu environment with C++ to interface a gaming controller with rover ROS software
-    - Used Github to commit code, organize work, and perform code reviews with other software team members
+    - Used Ubuntu 18.04, C++ and ROS to write code that interfaced controllers, motors, routers, and cameras, and performed end-to-end integration tests with all these components
+    - Specced, purchased and tested electronic speed controllers, LiPo batteries, and motors for rover's drivetrain
     - Troubleshooted routers with OpenWRT firmware to increase signal distance by 1km
 
-- company:
-    name: UBC AeroDesign
-    url: "http://ubcaerodesign.com/"
-    location: Vancouver, British Columbia, Canada
-    overview: UBC AeroDesign is an engineering student team at the University of British Columbia. The team designs, builds, and flies payload-lifting, radio-controlled fixed-wing airplanes to compete in the international SAE Aero Design Collegiate Series.
-  positions:
-  - designation: Avionics Team Member
-    start: September 2020
-    end: Present
-    responsibilities:
-    - Implemented real-time data visualization of avionics data on ground station website using React/JavaScript
-    - Implemented temporary fake avionics data generation using plane simulation to replace sensors that were unavail-able due to COVID-19
-    - Tutored new teammates on Android Studio, Git, and Javascript practices
-    - Participated in design discussions to improve communication between our plane and the ground station computer
