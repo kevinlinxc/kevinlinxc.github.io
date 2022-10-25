@@ -3,7 +3,7 @@ name: "Kevin Lin"
 nickname: "Kevin"
 # greeting message before your name. it will default to "Hi! I am" if not provided
 greeting: "Hi, I'm"
-image: "images/author/pfp.png"
+image: "images/author/pfp.jpg"
 # give your some contact information. they will be used in the footer
 contactInfo:
   email: "kevinlinxc@gmail.com"
@@ -11,9 +11,8 @@ contactInfo:
 
 # some summary about what you do
 summary:
-  - I am a 4th year Engineering Physics Student
-  - I am a Software Developer Intern at Sauce Labs
+  - I am a 5th year Engineering Physics Student
+  - I am a Reliability Software Intern at Tesla
   - I am a video and photo editing hobbyist
-  - This background is a stock photo that I took myself!
   - I play piano and alto sax!
   - I'm into investing
