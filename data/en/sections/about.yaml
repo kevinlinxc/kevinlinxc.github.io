@@ -8,7 +8,7 @@ section:
   template: sections/about.html
 
 # your designation
-designation: 4th Year UBC Engineering Physics 
+designation: 5th Year UBC Engineering Physics
 # your company information
 
 
@@ -16,7 +16,7 @@ designation: 4th Year UBC Engineering Physics
 resume: "files/resume.pdf"
 
 # a summary about you
-summary: "Hi, my name is Kevin and I am currently studying Engineering Physics at UBC. In my spare time, I make creative videos, take stock pictures, 
+summary: "Hi, my name is Kevin and I am currently studying Engineering Physics at UBC. In my spare time, I make creative videos, take stock pictures,
 game with friends, play piano/saxophone, and work on personal coding projects.  Check out my socials below or keep scrolling for more info on my hobbies and projects!"
 
 # your social links
