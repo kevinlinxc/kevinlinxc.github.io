@@ -11,24 +11,30 @@
 # ordered by weight from lowest to highest.
 
 [[main]]
-  name = "Blog"
-  pageRef = "blog"
+  name = "Blogbook"
+  pageRef = "blogbook"
   weight = 10
 
 [[main]]
   name = "Engineering"
   pageRef = "engineering"
-  weight = 10
+  weight = 20
 
 [[main]]
   name = "Video"
   pageRef = "video"
-  weight = 20
+  weight = 30
 
 [[main]]
   name = "Programming"
   pageRef = "programming"
-  weight = 30
+  weight = 40
+
+[[main]]
+  name = "Resume"
+  pageRef = "resume"
+  url = "https://drive.google.com/file/d/1WN34m4yICdLp8w0LLjRZ3F5fs0v7-ZvE/view?usp=sharing"
+  weight = 50
 
 
 # -- Footer Menu --
