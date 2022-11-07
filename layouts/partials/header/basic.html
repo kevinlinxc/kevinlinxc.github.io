@@ -35,7 +35,9 @@
                 class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2"
                 href="{{ .URL }}"
                 title="{{ .Title }}"
+                {{ if eq .Name "Resume"}}
                 target="_blank"
+                {{ end }}
                 >{{ .Name | markdownify | emojify }}</a
               >
             </li>

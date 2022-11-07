@@ -21,14 +21,14 @@
   weight = 20
 
 [[main]]
-  name = "Video"
+  name = "Video Editing"
   pageRef = "video"
-  weight = 30
+  weight = 40
 
 [[main]]
   name = "Programming"
   pageRef = "programming"
-  weight = 40
+  weight = 30
 
 [[main]]
   name = "Resume"
