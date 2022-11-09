@@ -9,3 +9,18 @@
 .mt-3 {
     margin-top: 0.75rem; /* 12px */
 }
+
+button#appearance-switcher {
+    position: absolute;
+    right: 15px;
+    bottom: 25px;
+    transition: 1000ms;
+}
+
+.dark .dark\:bg-neutral-800 {
+    transition: 300ms ease-in-out;
+}
+
+.bg-neutral {
+    transition: 300ms ease-in-out;
+}
