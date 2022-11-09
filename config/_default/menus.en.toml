@@ -22,7 +22,7 @@
 
 [[main]]
   name = "Video Editing"
-  pageRef = "video"
+  pageRef = "video_editing"
   weight = 40
 
 [[main]]
