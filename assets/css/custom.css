@@ -12,9 +12,13 @@
 
 button#appearance-switcher {
     position: absolute;
-    right: 15px;
+    left: 100px;
     bottom: 25px;
     transition: 1000ms;
+}
+
+.pointer-events-auto{
+    transition: 300ms;
 }
 
 .dark .dark\:bg-neutral-800 {
