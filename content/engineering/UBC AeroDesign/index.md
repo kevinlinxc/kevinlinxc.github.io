@@ -6,7 +6,7 @@ summary: "SAE Student Engineering Design Team"
 tags: ["engineering", "design", "software", "leadership"]
 showAuthor: False
 ---
-![](fizzatcomp.jpg)
+
 ## Summary
 **UBC AeroDesign** (UBCAD) is the University of British Columbia's airplane design team with over 50+ members. I've been on the team since
 2020, and I'm currently the **software lead**. My time on this team has been very rewarding: it has been both a source
@@ -14,6 +14,7 @@ of a lot of my growth as an engineer *and* the perfect place for me to apply and
 problems I solved.
 
 ## Competition
+![](fizzatcomp.jpg)
 The SAE AeroDesign competition during my time with the team was complex and intriguing.
 
 Teams had to build a large

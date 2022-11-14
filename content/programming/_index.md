@@ -6,4 +6,4 @@ center: false
 cascade:
   showReadingTime: false
 ---
-Some of my noteworthy programming projects.
+TODO :P
