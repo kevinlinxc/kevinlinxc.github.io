@@ -6,7 +6,6 @@ summary: "Student Engineering Design team that works on autonomous land rovers"
 tags: ["engineering", "software", "electrical", "integration"]
 showAuthor: False
 ---
-![Full Rover made by UBC Rover](rover.png)
 
 ## Summary
 UBC Rover (formerly known as UBC Snowbots) is the University of British Columbia's autonomous rover design team. I was on the team from my first year at university (2018) until I left the team in 2021. This was my first experience working on an interdisciplinary engineering team, and I definitely owe a lot of my engineering experience to the team. I eventually rose to the role of integration lead, meaning I was interfacing all the components that the team was working on.
