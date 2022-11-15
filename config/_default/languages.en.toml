@@ -6,8 +6,7 @@ weight = 1
 rtl = false
 
 title = "Kevin Lin"
-# logo = "img/logo.jpg"
-# description = "My awesome website"
+description = "Portfolio website of Kevin Lin, 5th year Engineering Physics student."
 # copyright = "Copy, _right?_ :thinking_face:"
 
 dateFormat = "2 January 2006"
