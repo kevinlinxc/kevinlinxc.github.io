@@ -2,7 +2,7 @@
 title: "QuickFormula"
 date: 2022-09-27
 description: "My idea for the best formula website"
-summary: "My idea for the best STEM formula website. Currently in very development."
+summary: "My idea for the best STEM formula website. Currently in early development still."
 tags: ["engineering", "software"]
 showAuthor: False
 ---
