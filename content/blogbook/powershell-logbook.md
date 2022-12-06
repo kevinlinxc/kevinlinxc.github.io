@@ -8,6 +8,7 @@ _build:
   render: "false"
   list: "local"
 ---
+
 PowerShell is the main shell used in VS Code and JetBrains IDEs on Windows computers, so it's good to know some optimizations.
 
 ## Adding a permanent alias e.g. g = git
