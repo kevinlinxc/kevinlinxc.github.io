@@ -13,6 +13,24 @@ So, this site is written with the static website framework, Hugo.
 I've had to do a bunch of discovery work to figure out how to customize the prebuilt templates to my liking,
 and this is my place to store all my discovery work for future reference.
 
+
+## Rendering Latex anywhere on a page
+With Katex, it turns out this is really easy, you just need to have this code on your page somewhere: https://katex.org/docs/autorender.html#usage
+
+Anything with the delimiters will be replaced with rendered Latex. The rendering can be customized with passed options to the function, or with CSS as well.
+
+
+## Concatenating strings for display
+I wanted to display double dollar signs on the ends of my latex, so I needed a way to concatenate strings. The + sign didn't do it, but this did:
+
+[https://blog.anantshri.info/concatinating-strings-in-hugo/](https://blog.anantshri.info/concatinating-strings-in-hugo/)
+
+The resultant line was:
+
+`{{ printf "%s" "$$" | printf "%s%s" .Params.latex | printf "%s%s" "$$" | printf "%s" }}`
+
+
+
 ## Playing gifs in Markdown/Hugo
 
 I wanted to play gifs on my [video editing portfolio page](https://kevinlinxc.com/video_editing/) because that would mean the people visiting
