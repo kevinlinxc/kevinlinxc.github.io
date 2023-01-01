@@ -1,6 +1,6 @@
 ---
 title: "Video Editing"
-description: A video editing profile"
+description: "A video editing profile of sorts"
 showdate: false
 showreadingtime: false
 # center: true
