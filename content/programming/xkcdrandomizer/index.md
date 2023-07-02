@@ -6,7 +6,7 @@ summary: "Twitter bot that creates permutations of the popular XKCD comics. "
 tags: ["engineering", "software"]
 showAuthor: False
 ---
-https://twitter.com/xkcdrandomizer
+https://twitter.com/xkcdrandomizer (inactive now because of Twitter API changes)
 
 [Source code](https://github.com/kevinlinxc/xkcdrandomizer)
 
