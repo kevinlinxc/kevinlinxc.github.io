@@ -2,7 +2,7 @@
 title: "Adding Aliases in PowerShell, Git Bash, CMD, and Zsh"
 center: false
 date: 2023-07-01
-summary: "How to add aliases to Windows terminals"
+summary: "How to add aliases/terminal functions to Windows terminals"
 showReadingTime: false
 _build:
   render: "false"
@@ -41,7 +41,7 @@ After saving and opening a new PowerShell window, you should be able to run `cod
 ## Git Bash
 The only complication for adding aliases to Git Bash is that the paths are somewhat different.
 
-First, enter git bash and run `nano ~/,bashrc`, or if you're scared of nano, run `notepad ~/.bashrc`. This will open or create the bash profile which is run at the startup of every Git Bash window.
+First, enter git bash and run `nano ~/.bashrc`, or if you're scared of nano, run `notepad ~/.bashrc`. This will open or create the bash profile which is run at the startup of every Git Bash window.
 
 Then, add these lines to the file:
 
