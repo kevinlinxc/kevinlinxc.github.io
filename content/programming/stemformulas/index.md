@@ -2,7 +2,7 @@
 title: "stemformulas.com"
 date: 2023-01-01
 description: "The best STEM formulas website"
-description: "The best STEM formulas website"
+summary: "The best STEM formulas website"
 tags: ["engineering", "software"]
 showAuthor: False
 ---

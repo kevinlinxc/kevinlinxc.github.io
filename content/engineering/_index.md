@@ -6,4 +6,4 @@ center: false
 cascade:
   showReadingTime: false
 ---
-My engineering experiences
+My broader engineering experience that involved more hardware (that I can talk about publicly).
