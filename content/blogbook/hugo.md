@@ -10,8 +10,57 @@ _build:
 ---
 So, this site is written with the static website framework, Hugo.
 
-I've had to do a bunch of discovery work to figure out how to customize the prebuilt templates to my liking,
+I've had to do a bunch of discovery work to figure out how to use it,
 and this is my place to store all my discovery work for future reference.
+
+## Running Hugo Locally with Docker
+It's relatively straightforward to run Hugo sites with Docker, but the tricky part is to get it to update when changes are made to files, as is normally the case when running
+with `hugo server`. One solution is to mount a volume, but I found a far more simple solution is to use the experimental "watch" feature of Docker compose. Note that you need to have Docker updated
+to have this feature.
+
+Then, you just need two files in your project directory: `docker-compose.yml` and `Dockerfile`.
+
+Dockerfile:
+```Dockerfile
+FROM hugomods/hugo:latest
+
+COPY . /src/
+
+EXPOSE 1313
+
+ENTRYPOINT [ "hugo", "server", "--bind=0.0.0.0"] 
+```
+
+docker-compose.yml:
+```yaml
+version: '3'
+services:
+  hugo:
+    build: .
+    ports:
+      - "1313:1313"
+    x-develop:
+      watch:
+        - action: sync
+          path: .
+          target: /src/
+```
+
+Finally, to run it, you just need to run [Docker](https://docs.docker.com/), and then in a terminal, go to your project repository and run 
+
+```
+docker compose up -d && docker compose alpha watch
+```
+in Bash/Zsh, or
+```
+docker compose up -d; docker compose alpha watch
+```
+on Powershell.
+
+
+The first half spins up the Dockerfile into a container, which runs the Hugo server, and the second half watches for changes and updates the container.
+
+Going to localhost:1313 should show the site running, and you could run this site without having Go or Hugo installed!
 
 
 ## Rendering Latex anywhere on a page
@@ -72,9 +121,11 @@ Links:
 I followed this guide for setting up my GoDaddy domain with GitHub Pages:
 https://jinnabalu.medium.com/godaddy-domain-with-github-pages-62aed906d4ef
 
+
 ## GitHub Pages rendering README.md instead of main site
 In case I forget how stupid this was, the reason my main page was a rendered README instead of the home page of my website was that my baseURL was commented out in config.toml:
 https://github.com/kevinlinxc/kevinlinxc.github.io/commit/2fcda5fd710cb638170860d5dcfb3a130f3c26f5
+
 
 ## Favicon not being updated
 I added favicons to the static folder as the documentation suggested, but nothing was being updated. It turned out I needed to clear the cache from Firefox's settings, not just on the page itself.
