@@ -100,7 +100,7 @@ This meant I would visit the gfycat link like https://gfycat.com/loathsomeblackc
 <video autoplay="" loop="" muted="" playsinline="" class="video"><source id="mp4Source" src="https://giant.gfycat.com/LoathsomeBlackCobra.mp4" type="video/mp4"><source id="gifSource" src="https://thumbs.gfycat.com/LoathsomeBlackCobra-size_restricted.gif" type="image/gif"></video>
 ```
 
-This met all the requirements, as it did render a gif, however, the resolution was not great.
+This met all the requirements, as it did render a gif, however, the resolution was not great. Also, in 2023, Gfycat got acquired by Snap and shut down, which meant all my gifs were gone.
 
 What I settled on was using a YouTube embed instead. I'm not sure if it's the best solution, as it probably drains a whole lot of data. I had to make my own "youtubegif" shortcode ([here](https://github.com/kevinlinxc/kevinlinxc.github.io/commit/c6db9af41fcd5e4e511c94667e627dde4283a751#diff-b703d762f460ee960b154ad19649f30d22fd4272920a5d337cd2e9452dd7a96c)) because the
 default YouTube shortcode doesn't have options to pass in controls and looping options.
@@ -109,7 +109,7 @@ Then, wherever I wanted to show a YouTube video as a pseudo-gif, I just needed t
 ```
 {{</* youtubegif ID */>}}
 ```
-with the ID being the YouTube video's ID.
+with the ID being the YouTube video's ID. This makes the video autoplay, loop, and have no controls, which is exactly what I wanted.
 
 Links:
 * https://discourse.gohugo.io/t/how-do-i-find-the-default-shortcode-source-code/41465/4
