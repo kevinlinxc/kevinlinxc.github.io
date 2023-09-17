@@ -20,4 +20,4 @@ showAuthor: False
 
 ## Conclusion
 I'm so proud of what I made on stemformulas.com, it looks modern, it's fast, and I use it all the time whenver I forget a formula.
-I'm sad to say it hasn't taken off/it doesn't provide other people as much value as it provides me, but at least the groundwork is laid down.
+I'm sad to say it hasn't taken off/it doesn't provide other people as much value as it provides me, but at least the groundwork is laid down. Still, the site has seen more than 8000 unique users, and I'm confident that if I keep adding formulas, I'll be able to help a lot of people eventually.
