@@ -26,14 +26,9 @@
   weight = 40
 
 [[main]]
-  name = "Programming"
-  pageRef = "programming"
-  weight = 30
-
-[[main]]
   name = "Resume"
   pageRef = "resume"
-  url = "https://drive.google.com/file/d/1ezbLaVPIUCCy3QLtpcOpqB4X-gNBkClK/view?usp=sharing"
+  url = "https://drive.google.com/file/d/1jdUUINErMXzHLyCRquhVovxEWVdQi98S/view?usp=sharing"
   weight = 50
 
 
