@@ -1,8 +1,8 @@
 ---
 title: "stemformulas.com"
 date: 2023-01-01
-description: "The best STEM formulas website"
-summary: "The best STEM formulas website"
+description: "Trying to be the best STEM formulas website"
+summary: "Trying to be the best STEM formulas website"
 tags: ["engineering", "software"]
 showAuthor: False
 ---
@@ -20,4 +20,7 @@ showAuthor: False
 
 ## Conclusion
 I'm so proud of what I made on stemformulas.com, it looks modern, it's fast, and I use it all the time whenver I forget a formula.
-I'm sad to say it hasn't taken off/it doesn't provide other people as much value as it provides me, but at least the groundwork is laid down. Still, the site has seen more than 8000 unique users, and I'm confident that if I keep adding formulas, I'll be able to help a lot of people eventually.
+The site has seen more than 8000 unique users, and I'm confident that if I keep adding features, it'll see even more.
+
+The main feature I want to add still is the ability to create formula sheets that can be shared, edited, remixed etc. 
+
