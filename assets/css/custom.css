@@ -28,3 +28,7 @@ button#appearance-switcher {
 .bg-neutral {
     transition: 300ms ease-in-out;
 }
+
+.sm\:me-menu {
+    margin-right: 1.15rem; /* custom to make the screenshots of the blog look better */
+}
