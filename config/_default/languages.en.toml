@@ -1,5 +1,4 @@
 title = "Kevin Lin"
-description = "Portfolio website of Kevin Lin, 6th year Engineering Physics student at UBC."
 
 [params]
 languageCode = "en"
@@ -8,18 +7,22 @@ displayName = "EN"
 isoCode = "en"
 weight = 1
 rtl = false
+dateFormat = "January 2 2006"
 
-# copyright = "Copy, _right?_ :thinking_face:"
+description = "Portfolio website of Kevin Lin, 6th year Engineering Physics student at UBC."
 
-dateFormat = "2 January 2006"
 
-[author]
+[params.author]
 name = "Kevin Lin"
 image = "img/me.jpg"
-headline = "Engineer, Video Editor, Photographer, Musician, Writer"
+headline = "Engineer, Video Editor, Photographer, Musician"
 # bio = "A little bit about you"
 links = [
-{ email = "mailto:kevinlinxc@gmail.com" },
+     { youtube = "https://www.youtube.com/@linguinelabs" },
+     { twitter = "https://twitter.com/linguinelabs" },
+     { github = "https://github.com/kevinlinxc" },
+     { medium = "https://kevinlinxc.medium.com/" },
+#{ email = "mailto:kevinlinxc@gmail.com" },
   #   { link = "https://link-to-some-website.com/" },
   #   { amazon = "https://www.amazon.com/hz/wishlist/ls/wishlist-id" },
   #   { apple = "https://www.apple.com" },
@@ -31,7 +34,6 @@ links = [
   #   { facebook = "https://facebook.com/username" },
   #   { flickr = "https://www.flickr.com/photos/username/" },
   #   { foursquare = "https://foursquare.com/username" },
-{ github = "https://github.com/kevinlinxc" },
   #   { gitlab = "https://gitlab.com/username" },
   #   { google = "https://www.google.com/" },
   #   { hashnode = "https://username.hashnode.dev" },
@@ -39,9 +41,8 @@ links = [
   #   { keybase = "https://keybase.io/username" },
   #   { kickstarter = "https://www.kickstarter.com/profile/username" },
   #   { lastfm = "https://lastfm.com/user/username" },
-{ linkedin = "https://linkedin.com/in/kevinlinxc" },
+  #   { linkedin = "https://linkedin.com/in/username" },
   #   { mastodon = "https://mastodon.instance/@username" },
-{ medium = "https://kevinlinxc.medium.com/" },
   #   { microsoft = "https://www.microsoft.com/" },
   #   { orcid = "https://orcid.org/userid" },
   #   { patreon = "https://www.patreon.com/username" },
@@ -57,7 +58,5 @@ links = [
   #   { tiktok = "https://tiktok.com/@username" },
   #   { tumblr = "https://username.tumblr.com" },
   #   { twitch = "https://twitch.tv/username" },
-  #   { twitter = "https://twitter.com/username" },
   #   { whatsapp = "https://wa.me/phone-number" },
-  #   { youtube = "https://youtube.com/username" },
 ]
