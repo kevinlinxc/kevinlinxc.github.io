@@ -5,7 +5,13 @@ My Portfolio/Blog website.
 
 Run the Hugo site using Docker compose:
 ```
-docker compose up -d && docker compose alpha watch
+docker compose up -d --build && docker compose watch
+```
+
+or on Windows:
+
+```
+docker compose up -d --build; if ($?) { docker compose watch }
 ```
 
 
