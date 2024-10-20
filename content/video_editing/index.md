@@ -12,6 +12,8 @@ cascade:
 
 This page is my version of a video editing portfolio, an annotated showcase of some of my favourite work.
 
+## 2024
+Currently working on a short film - subscribe to my [YouTube](https://www.youtube.com/@linguinelabs?sub_confirmation=1) to see it when it comes out!
 
 ## 2022
 An animation of my university program's logo, from scratch.
