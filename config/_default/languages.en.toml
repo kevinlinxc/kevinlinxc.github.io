@@ -14,7 +14,7 @@ description = "Portfolio website of Kevin Lin, 6th year Engineering Physics stud
 
 [params.author]
 name = "Kevin Lin"
-image = "img/me.jpg"
+image = "img/me.webp"
 headline = "Engineer, Video Editor, Photographer, Musician"
 # bio = "A little bit about you"
 links = [
