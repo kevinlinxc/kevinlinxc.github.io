@@ -13,7 +13,12 @@ cascade:
 This page is my version of a video editing portfolio, an annotated showcase of some of my favourite work.
 
 ## 2024
-Currently working on a short film - subscribe to my [YouTube](https://www.youtube.com/@linguinelabs?sub_confirmation=1) to see it when it comes out!
+In 2024, I spent 8 months working on a short film. It is by far the best vfx work I have ever done, easily 50 vfx shots, each with rotoscoping, compositing, and tracking. Give it a watch:
+
+{{< youtubegif nY0l1DbMbm0>}}
+
+## 2023
+I made videos in 2023 but not many involved vfx.
 
 ## 2022
 An animation of my university program's logo, from scratch.

@@ -1,8 +1,8 @@
 ---
 title: "bad-apple-irl"
 date: 2024-02-27
-description: "The greatest achievement of my life"
-summary: "The greatest achievement of my life"
+description: "The greatest achievement of my life (so far)"
+summary: "The greatest achievement of my life (so far)"
 tags: ["engineering", "software", "art", "creative"]
 showAuthor: False
 ---
