@@ -6,7 +6,7 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "content": "node scripts/build-content.mjs",
+    "content": "node --experimental-strip-types scripts/build-content.ts",
     "predev": "npm run content",
     "dev": "vinext dev",
     "prebuild": "npm run content",

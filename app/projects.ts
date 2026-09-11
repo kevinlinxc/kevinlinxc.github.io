@@ -381,4 +381,3 @@ export const projects = [...projectEntries].sort((a, b) => b.date.sort - a.date.
 export function projectSlug(name: string) { return name.normalize('NFKD').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
 export function projectBySlug(slug: string) { return projects.find(project => projectSlug(project.name) === slug); }
 export function projectHref(project: { name: string; section?: 'projects' | 'engineering' }) { return project.section === 'engineering' ? `/engineering/${projectSlug(project.name)}` : `/projects/${projectSlug(project.name)}`; }
-export function smooth(a: number, b: number, x: number) { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); }

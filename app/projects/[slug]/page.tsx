@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 import DocBody from '../../DocBody';
 import { projectDocs } from '../../generatedContent';
-import { projectBySlug, projectSlug, projects } from '../../story';
+import { projectBySlug, projectSlug, projects } from '../../projects';
 
 export function generateStaticParams(){return projects.filter(project=>project.section!=='engineering').map(project=>({slug:projectSlug(project.name)}));}
 
