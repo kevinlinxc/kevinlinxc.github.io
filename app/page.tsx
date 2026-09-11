@@ -4,7 +4,7 @@ import {ArrowDown,ArrowUpRight,Pause,Play} from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import TideField from './TideField';
-import {projectHref,projects} from './story';
+import {projectHref,projects} from './projects';
 const subscribeScroll=(notify:()=>void)=>{window.addEventListener('scroll',notify,{passive:true});window.addEventListener('resize',notify);return()=>{window.removeEventListener('scroll',notify);window.removeEventListener('resize',notify);};};
 const readScroll=()=>Math.max(0,window.scrollY/Math.max(1,window.innerHeight));
 export default function Home(){
