@@ -5,16 +5,21 @@ import Image from 'next/image';
 import Link from 'next/link';
 import SocialLinks from './SocialLinks';
 import TideField from './TideField';
+import {useScaffoldDive} from './useScaffoldDive';
 import {projectHref,projects} from './projects';
 export default function Home(){
+ const {root,overlay,dive,active,toggle}=useScaffoldDive();
  const [badAppleOnly,setBadAppleOnly]=useState(false);
  const visibleProjects=projects.filter(project=>!badAppleOnly||project.badApple);
- return <main id="top" className="tide-portfolio" data-tide-gallery>
-  <div className="portfolio-field"><TideField/></div>
+ return <main ref={root} id="top" className="tide-portfolio" data-tide-gallery>
+  <div className="portfolio-field"><TideField dive={dive}/></div>
+  <div className="dive-periphery" aria-hidden="true"/>
+  <div className="dive-hint" aria-hidden="true">↑ ↓ edges to travel · release / Esc to return</div>
+  <div className="dive-scene" aria-hidden="true" inert><div ref={overlay} className="dive-overlay"/></div>
   <div className="landing-intro">
   <header className="gallery-header"><a className="gallery-signature" href="#top" aria-label="Kevin Lin, back to the top">kl.</a><nav aria-label="Main navigation"><a href="#projects">Projects <ArrowDown size={14}/></a><Link href="/writing">Writing</Link><SocialLinks/></nav></header>
   <section className="profile-intro" aria-label="About Kevin Lin">
-   <div className="profile-portrait"><Image src="/assets/kevin-portrait.jpg" alt="Kevin Lin in front of the Golden Gate Bridge" fill sizes="(max-width: 1050px) 160px, 208px" priority unoptimized/></div>
+   <button type="button" className="profile-portrait" data-dive-trigger aria-label="Explore depth view. Drag to look around, or press Enter to toggle." aria-pressed={active} onClick={event=>{if(event.detail===0)toggle.current();}}><Image src="/assets/kevin-portrait.jpg" alt="Kevin Lin in front of the Golden Gate Bridge" fill sizes="(max-width: 1050px) 160px, 208px" priority unoptimized/></button>
    <div className="profile-copy"><h1>Kevin Lin</h1><p>Engineer & Digital Creative</p></div>
   </section>
   </div>
