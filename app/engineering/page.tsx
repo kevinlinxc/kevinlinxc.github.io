@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, ArrowUpRight } from 'lucide-react';
+import SocialLinks from '../SocialLinks';
 import { engineeringDocs } from '../generatedContent';
 
 export const metadata: Metadata = {
@@ -15,15 +16,21 @@ export default function EngineeringIndex() {
         <Link className="gallery-signature" href="/" aria-label="Kevin Lin, back home">kl.</Link>
         <nav>
           <Link href="/#projects">Projects</Link>
-          <Link href="/logbooks">Logbooks</Link>
-          <a href="https://github.com/kevinlinxc" target="_blank" rel="noreferrer">GitHub <ArrowUpRight size={14} /></a>
+          <Link href="/writing">Writing</Link>
+          <SocialLinks />
         </nav>
       </header>
       <section className="doc-index">
-        <Link className="project-back" href="/#projects"><ArrowLeft size={15} /> Back home</Link>
-        <p className="gallery-date">Engineering</p>
-        <h1 className="doc-index-title">Design teams</h1>
-        <p className="doc-index-intro">Two student engineering teams I grew up in at UBC: aeronautics and robotics.</p>
+        <header className="doc-index-head">
+          <div className="doc-index-heading">
+            <Link className="doc-index-back" href="/#projects" aria-label="Back home"><ArrowLeft size={14} /></Link>
+            <div>
+              <p className="gallery-date">Engineering</p>
+              <h1 className="doc-index-title">Design teams</h1>
+            </div>
+          </div>
+          <p className="doc-index-intro">Two student engineering teams I grew up in at UBC: aeronautics and robotics.</p>
+        </header>
         <ul className="doc-list">
           {engineeringDocs.map((doc) => (
             <li key={doc.slug}>

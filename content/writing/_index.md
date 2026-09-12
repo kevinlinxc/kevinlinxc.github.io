@@ -1,6 +1,6 @@
 ---
-title: "Logbooks"
-description: "Logbooks."
+title: "Writing"
+description: "Writing."
 ---
 
 

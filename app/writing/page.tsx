@@ -1,31 +1,35 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, ArrowUpRight } from 'lucide-react';
-import { logbookDocs } from '../generatedContent';
+import SocialLinks from '../SocialLinks';
+import { writingDocs } from '../generatedContent';
 
 export const metadata: Metadata = {
-  title: 'Logbooks · Kevin Lin',
-  description: 'Technical notes and things worth writing down.',
+  title: 'Writing · Kevin Lin',
+  description: 'Logbooks for projects and personal reflections.',
 };
 
-export default function LogbooksIndex() {
+export default function WritingIndex() {
   return (
     <main className="tide-portfolio project-detail">
       <header className="gallery-header">
         <Link className="gallery-signature" href="/" aria-label="Kevin Lin, back home">kl.</Link>
         <nav>
           <Link href="/#projects">Projects</Link>
-          <Link href="/engineering">Engineering</Link>
-          <a href="https://github.com/kevinlinxc" target="_blank" rel="noreferrer">GitHub <ArrowUpRight size={14} /></a>
+          <Link href="/writing">Writing</Link>
+          <SocialLinks />
         </nav>
       </header>
       <section className="doc-index">
-        <Link className="project-back" href="/#projects"><ArrowLeft size={15} /> Back home</Link>
-        <p className="gallery-date">Logbooks</p>
-        <h1 className="doc-index-title">Notes</h1>
-        <p className="doc-index-intro">Anything technical I have found useful to write down.</p>
+        <header className="doc-index-head">
+          <div className="doc-index-heading">
+            <Link className="doc-index-back" href="/#projects" aria-label="Back home"><ArrowLeft size={14} /></Link>
+            <h1 className="doc-index-title">Writing</h1>
+          </div>
+          <p className="doc-index-intro">Logbooks for projects and personal reflections.</p>
+        </header>
         <ul className="doc-list">
-          {logbookDocs.map((doc) => {
+          {writingDocs.map((doc) => {
             const body = (
               <>
                 <p className="gallery-date">{doc.dateLabel}</p>
@@ -41,7 +45,7 @@ export default function LogbooksIndex() {
                 {doc.externalUrl ? (
                   <a href={doc.externalUrl} target="_blank" rel="noreferrer">{body}</a>
                 ) : (
-                  <Link href={`/logbooks/${doc.slug}`}>{body}</Link>
+                  <Link href={`/writing/${doc.slug}`}>{body}</Link>
                 )}
               </li>
             );
