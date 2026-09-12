@@ -103,6 +103,43 @@ const backgroundVertex=`varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(pos
 const backgroundFragment=`varying vec2 vUv;${field}
 void main(){vec2 p=(vUv-.5)*vec2(uAspect,1.)*2.;float w=waves(p)*(1.-uCalm*.9)+probability(p);float f=(texture2D(uFilm,filmUV(p)).r-.5)*uReady*(1.-uCalm);float glow=exp(-abs(w+f*.2)*12.);vec3 c=vec3(.006,.014,.032)+vec3(.014,.026,.048)*glow; c+=vec3(.008,.014,.038)*smoothstep(-.3,.3,f);gl_FragColor=vec4(c,1.);}`;
 
+const portraitVertex = `
+attribute vec3 aColor,aScatter;
+attribute float aPhase;
+varying vec3 vColor;
+varying float vAlpha;
+uniform float uRatio,uPortrait;
+${field}
+vec4 projectPortraitDepth(vec3 world,vec2 flatPosition,float dive){
+ float yaw=uOrbit.x*1.335177*dive,pitch=-uOrbit.y*1.335177*dive;
+ world.xz=mat2(cos(yaw),-sin(yaw),sin(yaw),cos(yaw))*world.xz;
+ world.yz=mat2(cos(pitch),-sin(pitch),sin(pitch),cos(pitch))*world.yz;
+ float distance=4.+uEntry*2.;
+ float w=distance-world.z*dive;
+ vec2 xy=mix(flatPosition*distance,world.xy*3.4,dive)/vec2(uAspect,1.);
+ return vec4(xy,0.,w);
+}
+void main(){
+ float t=clamp((uPortrait-.18-aPhase*.22)/.62,0.,1.);
+ t=t*t*(3.-2.*t);
+ float drift=sin(uTime*.6+aPhase*6.2831)*.018*t;
+ vec2 home=position.xy*(1.+drift);
+ vec3 world=mix(vec3(home,0.),aScatter,t);
+ gl_Position=projectPortraitDepth(world,home,uPortrait);
+ vColor=aColor;
+ vAlpha=smoothstep(.02,.18,uPortrait);
+ gl_PointSize=(1.2+2.4*t)*uRatio*(1.+max(0.,world.z)*.2);
+}`;
+const portraitFragment = `
+varying vec3 vColor;
+varying float vAlpha;
+void main(){
+ float d=length(gl_PointCoord-.5);
+ float a=1.-smoothstep(.14,.5,d);
+ if(a<=.003)discard;
+ gl_FragColor=vec4(vColor,a*vAlpha*.9);
+}`;
+
 export default function TideField({dive}:{dive?:RefObject<DiveState>}){
  const backHost=useRef<HTMLDivElement>(null),player=useRef<HTMLVideoElement|null>(null);
  const invalidate=useRef(()=>{});
@@ -128,7 +165,7 @@ export default function TideField({dive}:{dive?:RefObject<DiveState>}){
   video.addEventListener('loadedmetadata',ready);video.addEventListener('error',videoError);
   video.addEventListener('loadeddata',requestRender);video.addEventListener('seeked',requestRender);
   const filmTexture=new THREE.VideoTexture(video);filmTexture.minFilter=THREE.LinearFilter;filmTexture.magFilter=THREE.LinearFilter;
-  const uniforms={uTime:{value:0},uAspect:{value:1},uScroll:{value:0},uReady:{value:0},uCalm:{value:0},uStory:{value:0},uDive:{value:0},uEntry:{value:0},uOrbit:{value:new THREE.Vector2()},uCard:{value:new THREE.Vector4(8,8,.6,.4)},uResolve:{value:0},uPresence:{value:0},uPointer:{value:new THREE.Vector2()},uTypeCenter:{value:new THREE.Vector2()},uFilm:{value:filmTexture},uRatio:{value:1},uLayer:{value:0}};
+  const uniforms={uTime:{value:0},uAspect:{value:1},uScroll:{value:0},uReady:{value:0},uCalm:{value:0},uStory:{value:0},uDive:{value:0},uEntry:{value:0},uOrbit:{value:new THREE.Vector2()},uCard:{value:new THREE.Vector4(8,8,.6,.4)},uResolve:{value:0},uPresence:{value:0},uPointer:{value:new THREE.Vector2()},uTypeCenter:{value:new THREE.Vector2()},uFilm:{value:filmTexture},uRatio:{value:1},uLayer:{value:0},uPortrait:{value:0}};
   const frontUniforms={...uniforms,uLayer:{value:1}};
   const camera=new THREE.Camera(),scene=new THREE.Scene();
   const geometry=new THREE.BufferGeometry(),depthGeometry=new THREE.BufferGeometry(),veilGeometry=new THREE.BufferGeometry();
@@ -154,37 +191,62 @@ export default function TideField({dive}:{dive?:RefObject<DiveState>}){
   const cageGeometry=new THREE.BufferGeometry();cageGeometry.setAttribute('position',new THREE.Float32BufferAttribute(cageVertices,3));
   const cageMaterial=new THREE.ShaderMaterial({uniforms,vertexShader:`${field}\nvarying float vFog; void main(){vec3 p=position;p.x*=uAspect;gl_Position=projectDepth(p,p.xy);vFog=(position.z+4.)/6.;}`,fragmentShader:'uniform float uDive; varying float vFog; void main(){gl_FragColor=vec4(mix(vec3(.18,.28,.85),vec3(.22,.8,1.),vFog),uDive*(.07+vFog*.14));}',transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending});
   const cage=new THREE.LineSegments(cageGeometry,cageMaterial);cage.frustumCulled=false;cage.renderOrder=1;scene.add(cage);
-  const portraitTexture=new THREE.TextureLoader().load('/assets/kevin-portrait.jpg',requestRender);
-  const orbUniforms={...uniforms,uPortrait:{value:new THREE.Vector3(0,0,.22)},uPhoto:{value:portraitTexture},uOrbPresence:{value:0}};
-  const orbVertex=`${field}
-   uniform vec3 uPortrait;
-   varying vec3 vSphere,vNormal;
-   void main(){
-    vSphere=position;
-    vec3 p=position;
-    float turn=uOrbit.x*.35*uDive;
-    p.xz=mat2(cos(turn),-sin(turn),sin(turn),cos(turn))*p.xz;
-    vNormal=p;
-    vec3 world=vec3(uPortrait.xy,-.45)+p*uPortrait.z*1.16;
-    gl_Position=projectDepth(world,world.xy);
-   }`;
-  const orbGeometry=new THREE.SphereGeometry(1,48,32);
-  const orbMaterial=new THREE.ShaderMaterial({uniforms:orbUniforms,vertexShader:orbVertex,fragmentShader:`
-   uniform sampler2D uPhoto; uniform float uOrbPresence; varying vec3 vSphere,vNormal;
-   void main(){
-    vec3 n=normalize(vNormal);
-    vec2 photoUV=vec2(.5,.48)+vSphere.xy*.33;
-    vec3 photo=texture2D(uPhoto,photoUV).rgb;
-    float diffuse=max(0.,dot(n,normalize(vec3(-.5,.65,1.))));
-    float rim=pow(1.-max(0.,n.z),2.8);
-    float gloss=pow(max(0.,dot(n,normalize(vec3(-.35,.5,1.)))),65.);
-    vec3 color=photo*(.42+.65*diffuse)+vec3(.12,.65,.9)*rim*.7+vec3(.8,.95,1.)*gloss*.35;
-    gl_FragColor=vec4(color,uOrbPresence);
-   }`,transparent:true,depthTest:false,depthWrite:false});
-  const orb=new THREE.Mesh(orbGeometry,orbMaterial);orb.frustumCulled=false;orb.renderOrder=5;scene.add(orb);
   const backgroundGeometry=new THREE.PlaneGeometry(2,2),backgroundMaterial=new THREE.ShaderMaterial({uniforms,vertexShader:backgroundVertex,fragmentShader:backgroundFragment,depthTest:false,depthWrite:false});
-  const background=new THREE.Mesh(backgroundGeometry,backgroundMaterial);background.frustumCulled=false;scene.add(background);
-  const resize=()=>{
+   const background=new THREE.Mesh(backgroundGeometry,backgroundMaterial);background.frustumCulled=false;scene.add(background);
+   const portraitGeometry=new THREE.BufferGeometry();
+   const portraitMaterial=new THREE.ShaderMaterial({uniforms,vertexShader:portraitVertex,fragmentShader:portraitFragment,transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending});
+   const portraitPoints=new THREE.Points(portraitGeometry,portraitMaterial);portraitPoints.frustumCulled=false;portraitPoints.renderOrder=3;portraitPoints.visible=false;scene.add(portraitPoints);
+   let portraitDiscX:Float32Array|null=null,portraitDiscY:Float32Array|null=null;
+   const portraitAnchor={x:0,y:0,rx:0,ry:0};
+   const applyAnchor=()=>{
+    if(!portraitDiscX||!portraitDiscY)return;
+    const count=portraitDiscX.length,positions=new Float32Array(count*3);
+    for(let i=0;i<count;i++){positions[i*3]=portraitAnchor.x+portraitDiscX[i]*portraitAnchor.rx;positions[i*3+1]=portraitAnchor.y+portraitDiscY[i]*portraitAnchor.ry;positions[i*3+2]=0;}
+    portraitGeometry.setAttribute('position',new THREE.BufferAttribute(positions,3));
+    requestRender();
+   };
+   const updateAnchor=()=>{
+    const node=document.querySelector<HTMLElement>('.profile-portrait');if(!node)return;
+    const bounds=node.getBoundingClientRect(),aspect=uniforms.uAspect.value;
+    portraitAnchor.x=((bounds.left+bounds.width/2)/width*2-1)*aspect;
+    portraitAnchor.y=1-(bounds.top+bounds.height/2)/height*2;
+    portraitAnchor.rx=bounds.width/2*(2/width)*aspect;
+    portraitAnchor.ry=bounds.height/2*(2/height);
+    applyAnchor();
+   };
+   const portraitImage=new Image();
+   portraitImage.decoding='async';
+   portraitImage.onload=()=>{
+    const size=512,imageWidth=portraitImage.naturalWidth,imageHeight=portraitImage.naturalHeight;
+    if(!imageWidth||!imageHeight)return;
+    const sampleHeight=Math.round(size*imageHeight/imageWidth);
+    const canvas=document.createElement('canvas');canvas.width=size;canvas.height=sampleHeight;
+    const context=canvas.getContext('2d');if(!context)return;
+    context.drawImage(portraitImage,0,0,size,sampleHeight);
+    const pixels=context.getImageData(0,0,size,sampleHeight).data;
+    const offsetY=(size-sampleHeight)/2,originX=size*.5,originY=size*.54,grid=84;
+    const discX:number[]=[],discY:number[]=[],colors:number[]=[],scatter:number[]=[],phases:number[]=[];
+    for(let iy=0;iy<grid;iy++)for(let ix=0;ix<grid;ix++){
+     const gx=(ix/(grid-1))*2-1,gy=(iy/(grid-1))*2-1;
+     if(gx*gx+gy*gy>1)continue;
+     const qx=(gx*.5+.5)*size,qy=(gy*.5+.5)*size;
+     const sx=originX+(qx-originX)/1.5,sy=originY+(qy-originY)/1.5-offsetY;
+     if(sx<0||sy<0||sx>=size||sy>=sampleHeight)continue;
+     const index=(Math.floor(sy)*size+Math.floor(sx))*4;
+     colors.push(pixels[index]/255,pixels[index+1]/255,pixels[index+2]/255);
+     discX.push(gx);discY.push(gy);
+     const angle=Math.random()*Math.PI*2,spread=.25+Math.random()*1.1;
+     scatter.push(Math.cos(angle)*spread,Math.sin(angle)*spread,(Math.random()-.2)*1.6);
+     phases.push(Math.random());
+    }
+    portraitDiscX=new Float32Array(discX);portraitDiscY=new Float32Array(discY);
+    portraitGeometry.setAttribute('aColor',new THREE.Float32BufferAttribute(colors,3));
+    portraitGeometry.setAttribute('aScatter',new THREE.Float32BufferAttribute(scatter,3));
+    portraitGeometry.setAttribute('aPhase',new THREE.Float32BufferAttribute(phases,1));
+    updateAnchor();
+   };
+   portraitImage.src='/assets/kevin-portrait.jpg';
+   const resize=()=>{
    const w=backEl.clientWidth,h=backEl.clientHeight;if(!w||!h)return;
    width=w;height=h;
    // Limit fill rate on Retina/large displays while preserving full CSS coverage.
@@ -204,6 +266,7 @@ export default function TideField({dive}:{dive?:RefObject<DiveState>}){
    depthGeometry.dispose();depthGeometry.setAttribute('position',geometry.getAttribute('position'));depthGeometry.setAttribute('aGrid',geometry.getAttribute('aGrid'));depthGeometry.setIndex(depthIndices);
    veilGeometry.dispose();veilGeometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(veilGrid.length/2*3),3));veilGeometry.setAttribute('aGrid',new THREE.Float32BufferAttribute(veilGrid,2));
    requestRender();
+   updateAnchor();
   };
   const pointer=new THREE.Vector2();
   const selectCard=(node:HTMLElement|null)=>{if(node!==activeCard){activeCard=node;hoverPhase=0;requestRender();}};
@@ -222,43 +285,46 @@ export default function TideField({dive}:{dive?:RefObject<DiveState>}){
    const frozen=reduced.matches,still=frozen||scroll>1.1;
    if(loaded&&still!==wasStill){if(still)video.pause();else play();wasStill=still;}
    const depth=dive?.current;
-   if(frozen&&!dirty&&!depth?.amount&&!uniforms.uDive.value)return;
+   if(frozen&&!dirty&&!depth?.amount&&!depth?.portrait&&!uniforms.uDive.value)return;
    dirty=false;
    const smoothing=1-Math.exp(-dt*2.4);
    if(!frozen){uniforms.uTime.value+=dt;uniforms.uPointer.value.lerp(pointer,smoothing);}
    fieldScroll+=(scroll-fieldScroll)*(frozen?1:smoothing);
    uniforms.uScroll.value=Math.min(fieldScroll,1);
    uniforms.uStory.value=1;
-   uniforms.uDive.value=(depth?.amount??0)*(frozen?.12:1);
+   const diveAmount=depth?.amount??0,portraitAmount=depth?.portrait??diveAmount;
+   uniforms.uDive.value=diveAmount*(frozen?.12:1);
+   uniforms.uPortrait.value=portraitAmount*(frozen?.12:1);
    uniforms.uEntry.value=depth?.entry??0;
    uniforms.uOrbit.value.set(depth?.x??0,depth?.y??0);
-   scaffold.visible=uniforms.uDive.value>.001;
-   dots.geometry=scaffold.visible?depthGeometry:geometry;
+   const inDepth=uniforms.uDive.value>.001;
+   portraitPoints.visible=uniforms.uPortrait.value>.001;
+   scaffold.visible=inDepth&&!depth?.exiting;
+   dots.geometry=inDepth?depthGeometry:geometry;
    cage.visible=scaffold.visible;
-   orb.visible=scaffold.visible&&Boolean(depth?.portrait);
-   orbUniforms.uOrbPresence.value=depth?.amount??0;
-   if(depth?.portrait)orbUniforms.uPortrait.value.set(depth.portrait.x,depth.portrait.y,depth.portrait.radius);
    uniforms.uCalm.value=smooth(.05,.85,fieldScroll)*.86*(1.-uniforms.uDive.value*.85);
    hoverPhase=Math.min(1,hoverPhase+(frozen?1:dt*1.7));
    uniforms.uResolve.value=smooth(0,1,hoverPhase);
    if(activeCard&&!activeCard.isConnected)activeCard=null;
-   uniforms.uPresence.value+=((activeCard&&!scaffold.visible? .6:0)-uniforms.uPresence.value)*(frozen?1:smoothing);
-   if(activeCard&&!scaffold.visible){
+   uniforms.uPresence.value+=((activeCard&&!inDepth? .6:0)-uniforms.uPresence.value)*(frozen?1:smoothing);
+   if(activeCard&&!inDepth){
     const bounds=activeCard.getBoundingClientRect();
     uniforms.uCard.value.set(((bounds.left+bounds.width/2)/width*2-1)*(width/height),1-(bounds.top+bounds.height/2)/height*2,bounds.width/height,bounds.height/height);
    }
    uniforms.uReady.value+=(video.readyState>=2?1-uniforms.uReady.value:0)*(frozen?1:smoothing);
    uniforms.uTypeCenter.value.set(0,.25+Math.min(fieldScroll,1)*2.);
    base.render(scene,camera);
-   if(!frozen||(depth?.amount??0)>0)frame=requestAnimationFrame(render);
+   if(!frozen||diveAmount>0||portraitAmount>0)frame=requestAnimationFrame(render);
   }
   const visibility=()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;video.pause();wasStill=true;}else{last=performance.now()-interval;requestRender();}};
   window.addEventListener('scroll',requestRender,{passive:true});
-  window.addEventListener('portfolio-dive',requestRender);
+   const onDive=()=>{updateAnchor();requestRender();};
+   window.addEventListener('portfolio-dive',onDive);
   document.addEventListener('visibilitychange',visibility);
   reduced.addEventListener('change',requestRender);
   const observer=new ResizeObserver(resize);observer.observe(backEl);resize();
-  return()=>{disposed=true;invalidate.current=()=>{};cancelAnimationFrame(frame);observer.disconnect();window.removeEventListener('pointermove',move);window.removeEventListener('focusin',focus);window.removeEventListener('scroll',requestRender);window.removeEventListener('portfolio-dive',requestRender);document.removeEventListener('visibilitychange',visibility);reduced.removeEventListener('change',requestRender);video.removeEventListener('loadedmetadata',ready);video.removeEventListener('loadeddata',requestRender);video.removeEventListener('seeked',requestRender);video.removeEventListener('error',videoError);video.pause();video.removeAttribute('src');video.load();player.current=null;geometry.dispose();depthGeometry.dispose();veilGeometry.dispose();scaffoldGeometry.dispose();scaffoldMaterial.dispose();cageGeometry.dispose();cageMaterial.dispose();orbGeometry.dispose();orbMaterial.dispose();portraitTexture.dispose();material.dispose();veilMaterial.dispose();backgroundGeometry.dispose();backgroundMaterial.dispose();filmTexture.dispose();base.dispose();base.domElement.remove();};
+  return()=>{disposed=true;invalidate.current=()=>{};cancelAnimationFrame(frame);observer.disconnect();window.removeEventListener('pointermove',move);window.removeEventListener('focusin',focus);window.removeEventListener('scroll',requestRender);window.removeEventListener('portfolio-dive',onDive);
+   portraitImage.onload=null;portraitGeometry.dispose();portraitMaterial.dispose();document.removeEventListener('visibilitychange',visibility);reduced.removeEventListener('change',requestRender);video.removeEventListener('loadedmetadata',ready);video.removeEventListener('loadeddata',requestRender);video.removeEventListener('seeked',requestRender);video.removeEventListener('error',videoError);video.pause();video.removeAttribute('src');video.load();player.current=null;geometry.dispose();depthGeometry.dispose();veilGeometry.dispose();scaffoldGeometry.dispose();scaffoldMaterial.dispose();cageGeometry.dispose();cageMaterial.dispose();material.dispose();veilMaterial.dispose();backgroundGeometry.dispose();backgroundMaterial.dispose();filmTexture.dispose();base.dispose();base.domElement.remove();};
  },[dive]);
  return <><div ref={backHost} className="tide-back" aria-hidden="true"/>{blocked&&<button className="field-play" onClick={()=>{void player.current?.play().then(()=>setBlocked(false)).catch(()=>{});}}>Play the field</button>}{failed&&<p className="tide-error">The moving field couldn&apos;t load. Your introduction and projects are still available.</p>}</>;
 }

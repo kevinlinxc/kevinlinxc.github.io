@@ -1,19 +1,22 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 
-export type DiveState={amount:number;x:number;y:number;speed:number;entry:number;travel:number;portrait?:{x:number;y:number;radius:number}};
+export type DiveState={amount:number;x:number;y:number;speed:number;entry:number;travel:number;portrait:number;exiting?:boolean};
 const clamp=(value:number,min=-1,max=1)=>Math.max(min,Math.min(max,value));
+const smoothstep=(a:number,b:number,x:number)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t);};
 export function useScaffoldDive(){
  const root=useRef<HTMLElement>(null),overlay=useRef<HTMLDivElement>(null);
- const dive=useRef<DiveState>({amount:0,x:0,y:0,speed:0,entry:0,travel:0});
+  const dive=useRef<DiveState>({amount:0,x:0,y:0,speed:0,entry:0,travel:0,portrait:0});
  const toggle=useRef(()=>{});
  const [active,setActive]=useState(false);
  useEffect(()=>{
   const page=root.current,layer=overlay.current;if(!page||!layer)return;
+  const state=dive.current;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   let target=0,tx=0,ty=0,energy=0,frame=0,last=performance.now(),pointerId:number|null=null;
   let originX=0,originY=0,mouseX=.5,mouseY=.5,dragging=false,pinned=false,suppressUntil=0,disposed=false;
-  let layoutDirty=false,maxScroll=0,portraitDocument:{x:number;y:number;radius:number}|undefined;
+  let intro=false,introStart=0,introTimer:ReturnType<typeof setTimeout>|undefined,exitStart=0,exitAmount=0,exitDuration=220,exitPortraitFrom=0,exitPortraitDuration=720;
+  let layoutDirty=false,maxScroll=0;
   const scene=layer.parentElement!,periphery=page.querySelector<HTMLElement>('.dive-periphery')!;
   const styleCache=new WeakMap<HTMLElement,Map<string,string>>();
   const style=(node:HTMLElement,key:string,value:string)=>{
@@ -42,7 +45,7 @@ export function useScaffoldDive(){
     const portrait=node.classList.contains('profile-portrait'),type=node.classList.contains('profile-copy'),card=node.hasAttribute('data-field-card');
     const heading=node.classList.contains('collection-heading'),header=node.classList.contains('gallery-header');
     const surface=document.createElement('div');surface.className=`dive-surface${portrait?' dive-portrait':type?' dive-type':card?' dive-project':heading?' dive-collection':header?' dive-navigation':''}`;
-    surface.style.setProperty('--surface-depth',type?'65px':`${35+(copies.size%3)*30}px`);
+    surface.style.setProperty('--surface-depth',card||heading||node.classList.contains('gallery-footer')?'-280px':type||portrait?'65px':'35px');
     Object.assign(surface.style,{left:`${rect.left}px`,top:`${rect.top+scroll}px`,width:`${rect.width}px`,height:`${rect.height}px`});
     if(card){
      const backing=document.createElement('div');backing.className='dive-card-backing';surface.appendChild(backing);
@@ -52,6 +55,7 @@ export function useScaffoldDive(){
       // Each piece is a direct sibling in the 3D space, without a full-card wrapper.
       Object.assign(pieceLayer.style,{left:`${bounds.left-rect.left}px`,top:`${bounds.top-rect.top}px`,width:`${bounds.width}px`,height:`${bounds.height}px`});
       pieceLayer.style.setProperty('--piece-depth',`${image?20:title?30:date?24:12}px`);
+      pieceLayer.style.setProperty('--piece-phase',`${-(copies.size*.137+surface.children.length*.193)}s`);
       const copy=cleanCopy(piece);Object.assign(copy.style,{width:'100%',height:'100%',margin:'0',font,letterSpacing,color});
       pieceLayer.appendChild(copy);surface.appendChild(pieceLayer);
      }
@@ -67,7 +71,6 @@ export function useScaffoldDive(){
      plane.appendChild(copy);surface.appendChild(plane);
     }
     layer.appendChild(surface);copies.set(node,{surface,opacity:node.style.opacity});
-    if(portrait)portraitDocument={x:(rect.left+rect.width/2-innerWidth/2)*2/innerHeight,y:rect.top+scroll+rect.height/2,radius:rect.width/innerHeight};
    }
   };
   const draw=(now:number)=>{
@@ -75,21 +78,28 @@ export function useScaffoldDive(){
    if(now-last<15){frame=requestAnimationFrame(draw);return;}
    const dt=Math.min((now-last)/1000,.05);last=now;
    const s=dive.current,k=1-Math.exp(-dt*7),strength=reduced.matches?.10:1;
-   s.amount+=(target-s.amount)*(1-Math.exp(-dt*(target?4.5:7)));
+   if(target)s.amount+=(1-s.amount)*(1-Math.exp(-dt*4.5));
+   else s.amount=exitAmount*Math.pow(1-clamp((now-exitStart)/exitDuration,0,1),3);
+   if(target)s.portrait+=(1-s.portrait)*(1-Math.exp(-dt*3));
+   else s.portrait=exitPortraitFrom*Math.pow(1-clamp((now-exitStart)/exitPortraitDuration,0,1),2);
+   if(intro){
+    const progress=clamp((now-introStart)/1250,0,1),eased=progress*progress*(3-2*progress);
+    const radius=Math.hypot(-.16,.06)*(1-eased),angle=Math.atan2(.06,-.16)-eased*Math.PI;
+    tx=Math.cos(angle)*radius;ty=Math.sin(angle)*radius;
+   }
    s.x+=(tx-s.x)*k;s.y+=(ty-s.y)*k;s.speed+=(energy-s.speed)*k;energy*=Math.exp(-dt*9);
    if(target&&s.amount>.999)s.amount=1;
-   s.entry=target?Math.sin(Math.PI*s.amount)*strength:0;
+   s.entry=target&&!intro?Math.sin(Math.PI*s.amount)*strength:0;
    // Downward travel starts in the bottom quarter; upward travel keeps its smaller edge zone.
    const edge=mouseY<.15?-Math.pow((.15-mouseY)/.15,2):mouseY>.75?Math.pow((mouseY-.75)/.25,2):0;
-   const velocity=target&&!reduced.matches?edge*innerHeight*1.35*s.amount:0;
+   const velocity=target&&!intro&&!reduced.matches?edge*innerHeight*2.7*s.amount:0;
    const nextScroll=clamp(window.scrollY+velocity*dt,0,maxScroll);
    s.travel+=(Math.abs(nextScroll-window.scrollY)/Math.max(dt, .001)/innerHeight-s.travel)*k;
    if(Math.abs(nextScroll-window.scrollY)>.1){window.scrollTo({top:nextScroll,behavior:'instant'});}
    if(layoutDirty&&s.amount>.001){capture();layoutDirty=false;}
-   if(!target&&s.amount<.002){s.amount=0;s.x=0;s.y=0;s.speed=0;s.entry=0;s.travel=0;clear();page.removeAttribute('data-diving');}
+   if(!target&&s.amount<.002&&s.portrait<.002){s.amount=0;s.portrait=0;s.x=0;s.y=0;s.speed=0;s.entry=0;s.travel=0;clear();page.removeAttribute('data-diving');page.removeAttribute('data-dive-exiting');page.removeAttribute('data-dive-intro');s.exiting=false;}
    style(scene,'--dive',s.amount.toFixed(3));
    style(scene,'--dive-scroll',`${(-window.scrollY).toFixed(1)}px`);
-   if(portraitDocument)dive.current.portrait={x:portraitDocument.x,y:1-(portraitDocument.y-window.scrollY)*2/innerHeight,radius:portraitDocument.radius};
    style(scene,'--dive-yaw',`${s.x*s.amount*strength*76.5}deg`);
    style(scene,'--dive-pitch',`${-s.y*s.amount*strength*76.5}deg`);
    style(scene,'--dive-pan-x',`${s.x*s.amount*strength*45}px`);
@@ -102,16 +112,28 @@ export function useScaffoldDive(){
    style(periphery,'--dive-focus-y',`${mouseY*100}%`);
    style(periphery,'--dive',s.amount.toFixed(3));
    style(periphery,'--dive-rush',String((s.entry*.8+Math.min(1,s.travel+s.speed)*.4)*strength));
-   copies.forEach((_,node)=>{style(node,'opacity',(1-s.amount).toFixed(3));});
-   if(target||s.amount>0)frame=requestAnimationFrame(draw);
+   copies.forEach((_,node)=>{style(node,'opacity',(node.classList.contains('profile-portrait')?1-smoothstep(.05,.42,s.portrait):1-s.amount).toFixed(3));});
+   if(target||s.amount>0||s.portrait>0)frame=requestAnimationFrame(draw);
   };
   const wake=()=>{if(!frame){last=performance.now();frame=requestAnimationFrame(draw);}};
-  const enter=()=>{if(!target){capture();page.setAttribute('data-diving','true');setActive(true);}target=1;wake();window.dispatchEvent(new Event('portfolio-dive'));};
-  const leave=()=>{target=0;tx=0;ty=0;pinned=false;setActive(false);wake();};
+  const stopIntro=()=>{clearTimeout(introTimer);intro=false;page.removeAttribute('data-dive-intro');};
+  const enter=()=>{
+   stopIntro();page.removeAttribute('data-dive-exiting');dive.current.exiting=false;
+   if(!target){capture();page.setAttribute('data-diving','true');}
+   setActive(true);target=1;wake();window.dispatchEvent(new Event('portfolio-dive'));
+  };
+  const leave=(duration=220)=>{
+   stopIntro();
+   if(!target)return;
+   exitStart=performance.now();exitAmount=dive.current.amount;exitDuration=duration;exitPortraitFrom=dive.current.portrait;exitPortraitDuration=Math.max(duration,720);
+   target=0;tx=0;ty=0;pinned=false;dive.current.exiting=true;
+   page.setAttribute('data-dive-exiting','true');setActive(false);wake();
+  };
   toggle.current=()=>{if(target)leave();else{pinned=true;mouseX=.5;mouseY=.5;enter();}};
   const down=(e:PointerEvent)=>{
    const node=e.target as Element;
    if(e.button!==0||!e.isPrimary||node.closest('input,textarea,select,[contenteditable="true"]'))return;
+   if(intro)leave();
    const trigger=Boolean(node.closest('[data-dive-trigger]'));
    if(e.pointerType==='touch'&&!trigger)return;
    pointerId=e.pointerId;originX=e.clientX;originY=e.clientY;dragging=false;
@@ -134,14 +156,24 @@ export function useScaffoldDive(){
   const click=(e:MouseEvent)=>{if(performance.now()<suppressUntil||dragging){e.preventDefault();e.stopPropagation();}else if(pinned&&(e.target as Element).closest('a,button:not([data-dive-trigger])'))leave();};
   const cancel=()=>{end();leave();};
   const keys=(e:KeyboardEvent)=>{if(e.key==='Escape')cancel();};
-  const onScroll=()=>{if(target||dive.current.amount>.001)wake();};
-  const update=()=>{if(target||dive.current.amount>.001){layoutDirty=true;wake();}};
+  const onScroll=()=>{if(intro)leave();if(target||dive.current.amount>.001||dive.current.portrait>.001)wake();};
+  const update=()=>{if(target||dive.current.amount>.001||dive.current.portrait>.001){layoutDirty=true;wake();}};
   const nativeDrag=(e:DragEvent)=>e.preventDefault();
   const visibility=()=>{if(document.hidden)cancel();};
   page.addEventListener('pointerdown',down);window.addEventListener('pointermove',move,{passive:false});window.addEventListener('pointerup',end);window.addEventListener('pointercancel',cancel);
   page.addEventListener('click',click,true);page.addEventListener('dragstart',nativeDrag);window.addEventListener('keydown',keys);window.addEventListener('blur',cancel);
   window.addEventListener('resize',update);window.addEventListener('scroll',onScroll,{passive:true});document.addEventListener('visibilitychange',visibility);
-  return()=>{disposed=true;cancelAnimationFrame(frame);clear();toggle.current=()=>{};page.removeAttribute('data-diving');
+  // A short, angled camera pass exposes the layers before resolving into the ordinary page.
+  if(!reduced.matches&&!document.hidden){
+   capture();target=1;intro=true;introStart=performance.now();dive.current.amount=1;dive.current.x=-.16;dive.current.y=.06;dive.current.exiting=false;
+   page.setAttribute('data-diving','true');page.setAttribute('data-dive-intro','true');
+   last=performance.now()-17;draw(performance.now());
+   window.dispatchEvent(new Event('portfolio-dive'));
+   introTimer=setTimeout(()=>leave(800),1250);
+  }
+  return()=>{disposed=true;clearTimeout(introTimer);cancelAnimationFrame(frame);clear();toggle.current=()=>{};
+   Object.assign(state,{amount:0,x:0,y:0,entry:0,speed:0,travel:0,portrait:0,exiting:false});
+   page.removeAttribute('data-diving');page.removeAttribute('data-dive-exiting');page.removeAttribute('data-dive-intro');
    page.removeEventListener('pointerdown',down);window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',end);window.removeEventListener('pointercancel',cancel);page.removeEventListener('click',click,true);page.removeEventListener('dragstart',nativeDrag);window.removeEventListener('keydown',keys);window.removeEventListener('blur',cancel);window.removeEventListener('resize',update);window.removeEventListener('scroll',onScroll);document.removeEventListener('visibilitychange',visibility);
   };
  },[]);

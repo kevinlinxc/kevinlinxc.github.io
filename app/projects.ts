@@ -31,7 +31,7 @@ const projectEntries: Project[] = [
     "badApple": true,
     "clips": [
       {
-        "name": "Source Code",
+        "name": "GitHub",
         "url": "https://github.com/kevinlinxc/badapple-sleep"
       }
     ],
@@ -47,19 +47,31 @@ const projectEntries: Project[] = [
     "link": "Play the game",
     "image": "/assets/projects/vim-vim-revolution.webp",
     "alt": "Vim Vim Revolution logo",
-    "imageFit": "contain",
     "date": {
       "label": "May 2026",
       "sort": 20260526
     }
   },
   {
+    "name": "Bad Apple but it's made of lyrics",
+    "description": "Bad Apple but the silhouette is displacing its own Eng/JP lyrics using pretext.",
+    "url": "https://x.com/linguinelabs/status/2038248755401740730",
+    "link": "Video",
+    "image": "/assets/projects/bad-apple-pretext.webp",
+    "alt": "Bad Apple but it's made of lyrics",
+    "badApple": true,
+    "date": {
+      "label":  "Mar 2026",
+      "sort": 20260329
+    }
+  },
+  {
     "name": "Viewlingo",
     "description": "3rd-place YC Hackathon project that translated objects in your smart glasses field of view and created interactive flashcards for review on your phone.",
     "url": "https://github.com/kevinlinxc/viewlingo",
-    "link": "Explore the project",
-    "image": null,
-    "alt": "",
+    "link": "GitHub",
+    "image": "/assets/projects/viewlingo.webp",
+    "alt": "Viewlingo smart glasses app showing vocabulary flashcards",
     "date": {
       "label": "July 2025",
       "sort": 20250712
@@ -103,7 +115,7 @@ const projectEntries: Project[] = [
     },
     "clips": [
       {
-        "name": "Source Code",
+        "name": "GitHub",
         "url": "https://github.com/kevinlinxc/badapple-pdf"
       }
     ]
@@ -124,7 +136,7 @@ const projectEntries: Project[] = [
     "name": "Ultrasonic Holography",
     "description": "Our capstone project: pushing the open-source frontier of ultrasonic array levitation.",
     "url": "https://github.com/ultrasonic-homies/ultrasonic-holography",
-    "link": "Github",
+    "link": "GitHub",
     "image": "/assets/projects/ultrasonic-holography.webp",
     "alt": "Ultrasonic Holography capstone hardware and demonstrations",
     "date": {
@@ -224,7 +236,7 @@ const projectEntries: Project[] = [
     "name": "DeSynthesia",
     "description": "Unsuccesfully turning piano tutorial videos into MIDI and sheet music with computer vision.",
     "url": "https://github.com/kevinlinxc/DeSynthesia",
-    "link": "Source Code",
+    "link": "GitHub",
     "image": "/assets/projects/desynthesia.webp",
     "alt": "DeSynthesia piano note detection project",
     "date": {
@@ -318,6 +330,3 @@ const projectEntries: Project[] = [
   }
 ];
 export const projects = [...projectEntries].sort((a, b) => b.date.sort - a.date.sort);
-export function projectSlug(name: string) { return name.normalize('NFKD').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
-export function projectBySlug(slug: string) { return projects.find(project => projectSlug(project.name) === slug); }
-export function projectHref(project: { name: string; section?: 'projects' | 'engineering' }) { return project.section === 'engineering' ? `/engineering/${projectSlug(project.name)}` : `/projects/${projectSlug(project.name)}`; }

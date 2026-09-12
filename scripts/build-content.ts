@@ -110,19 +110,6 @@ const engineering = [
   }),
 );
 
-const projectSlugs = ['stemformulas', 'b-flat', 'desynthesia'];
-const projectDocs = Object.fromEntries(
-  projectSlugs.map((slug) => [
-    slug,
-    buildDoc({
-      file: path.join(contentDir, 'engineering', slug, 'index.md'),
-      sourceDir: path.join(contentDir, 'engineering', slug),
-      slug,
-      section: 'projects',
-    }),
-  ]),
-);
-
 const writingSources = fs
   .readdirSync(path.join(contentDir, 'writing'), { withFileTypes: true })
   .filter((entry) => entry.isFile() && entry.name.endsWith('.md') && entry.name !== '_index.md')
@@ -147,11 +134,10 @@ const output =
   banner +
   'export type Doc={slug:string;title:string;date:string;dateLabel:string;summary:string;externalUrl?:string;html:string};\n' +
   `export const engineeringDocs:Doc[]=${JSON.stringify(engineering, null, 2)};\n` +
-  `export const projectDocs:Record<string,Doc>=${JSON.stringify(projectDocs, null, 2)};\n` +
   `export const writingDocs:Doc[]=${JSON.stringify(writing, null, 2)};\n`;
 
 fs.mkdirSync(path.dirname(outFile), { recursive: true });
 fs.writeFileSync(outFile, output);
 console.log(
-  `Generated ${engineering.length} engineering docs, ${Object.keys(projectDocs).length} project docs, ${writing.length} writing docs.`,
+  `Generated ${engineering.length} engineering docs, ${writing.length} writing docs.`,
 );
