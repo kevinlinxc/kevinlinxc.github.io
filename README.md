@@ -1,15 +1,15 @@
-# Kevin Lin — Portfolio
+# Kevin Lin - Portfolio
 
 Personal portfolio for Kevin Lin: engineer, digital artist, and musician. The site
 is a naturally scrolling project gallery with an ethereal Three.js particle field
-behind it, plus dedicated engineering and logbook sections.
+behind it, plus dedicated engineering and writing sections.
 
 ## Overview
 
-- `/` — homepage grid of projects with an All / Bad Apple filter.
-- `/projects/<slug>` — a page per project.
-- `/engineering` — UBC AeroDesign and UBC Rover write-ups.
-- `/logbooks` — technical notes, migrated from the previous site.
+- `/` - homepage grid of projects with an All / Bad Apple filter.
+- `/projects/<slug>` - a page per project.
+- `/engineering` - UBC AeroDesign and UBC Rover write-ups.
+- `/writing` - technical notes, migrated from the previous site.
 
 The project is a React app built with [Vinext](https://www.npmjs.com/package/vinext)
 (Next.js-style routing on Vite) and ships as a static export. Styling is Tailwind
@@ -65,9 +65,9 @@ npm run start
 ## Project structure
 
 ```
-app/            Routes and UI (homepage, projects, engineering, logbooks, field)
-content/        Markdown source for engineering and logbooks
-scripts/        build-content.mjs — Markdown to generatedContent.ts
+app/            Routes and UI (homepage, projects, engineering, writing, field)
+content/        Markdown source for engineering and writing
+scripts/        build-content.mjs - Markdown to generatedContent.ts
 public/         Static assets, CNAME, .nojekyll
 ```
 

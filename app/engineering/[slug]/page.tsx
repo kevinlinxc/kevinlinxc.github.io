@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, ArrowUpRight } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import DocBody from '../../DocBody';
+import SocialLinks from '../../SocialLinks';
 import { engineeringDocs } from '../../generatedContent';
 
 export function generateStaticParams() {
@@ -23,9 +24,8 @@ export default async function EngineeringPage({ params }: { params: Promise<{ sl
       <header className="gallery-header">
         <Link className="gallery-signature" href="/" aria-label="Kevin Lin, back home">kl.</Link>
         <nav>
-          <Link href="/engineering"><ArrowLeft size={14} /> Engineering</Link>
-          <Link href="/logbooks">Logbooks</Link>
-          <a href="https://github.com/kevinlinxc" target="_blank" rel="noreferrer">GitHub <ArrowUpRight size={14} /></a>
+          <Link href="/writing">Writing</Link>
+          <SocialLinks />
         </nav>
       </header>
       <article className="project-detail-content doc-article">

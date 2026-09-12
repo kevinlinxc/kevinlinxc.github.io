@@ -123,21 +123,21 @@ const projectDocs = Object.fromEntries(
   ]),
 );
 
-const logbookSources = fs
-  .readdirSync(path.join(contentDir, 'logbooks'), { withFileTypes: true })
+const writingSources = fs
+  .readdirSync(path.join(contentDir, 'writing'), { withFileTypes: true })
   .filter((entry) => entry.isFile() && entry.name.endsWith('.md') && entry.name !== '_index.md')
-  .map((entry) => ({ file: path.join(contentDir, 'logbooks', entry.name), slug: entry.name.replace(/\.md$/, '') }));
+  .map((entry) => ({ file: path.join(contentDir, 'writing', entry.name), slug: entry.name.replace(/\.md$/, '') }));
 
-const wslFile = path.join(contentDir, 'logbooks', 'wsl-logbook', 'index.md');
-if (fs.existsSync(wslFile)) logbookSources.push({ file: wslFile, slug: 'wsl-logbook' });
+const wslFile = path.join(contentDir, 'writing', 'wsl-logbook', 'index.md');
+if (fs.existsSync(wslFile)) writingSources.push({ file: wslFile, slug: 'wsl-logbook' });
 
-const logbooks = logbookSources
+const writing = writingSources
   .map(({ file, slug }) =>
     buildDoc({
       file,
       sourceDir: path.dirname(file),
       slug,
-      section: 'logbooks',
+      section: 'writing',
     }),
   )
   .sort((a, b) => (a.date < b.date ? 1 : -1));
@@ -148,10 +148,10 @@ const output =
   'export type Doc={slug:string;title:string;date:string;dateLabel:string;summary:string;externalUrl?:string;html:string};\n' +
   `export const engineeringDocs:Doc[]=${JSON.stringify(engineering, null, 2)};\n` +
   `export const projectDocs:Record<string,Doc>=${JSON.stringify(projectDocs, null, 2)};\n` +
-  `export const logbookDocs:Doc[]=${JSON.stringify(logbooks, null, 2)};\n`;
+  `export const writingDocs:Doc[]=${JSON.stringify(writing, null, 2)};\n`;
 
 fs.mkdirSync(path.dirname(outFile), { recursive: true });
 fs.writeFileSync(outFile, output);
 console.log(
-  `Generated ${engineering.length} engineering docs, ${Object.keys(projectDocs).length} project docs, ${logbooks.length} logbooks.`,
+  `Generated ${engineering.length} engineering docs, ${Object.keys(projectDocs).length} project docs, ${writing.length} writing docs.`,
 );
