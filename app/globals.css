@@ -580,6 +580,124 @@ html {
     grid-template-rows: auto 1fr
 }
 
+/* The whole document remains available when the camera looks along the page. */
+.tide-portfolio { --dive: 0; --dive-split: 0px; --dive-glitch: 0px; }
+.dive-filter-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+.profile-portrait[data-dive-trigger] { padding: 0; cursor: grab; touch-action: none; background: transparent; }
+.profile-portrait:focus-visible { outline: 2px solid #a7d7ef; outline-offset: 8px; }
+[data-diving], [data-diving] * { cursor: grabbing !important; user-select: none; }
+.dive-scene {
+    position: fixed;
+    inset: 0;
+    perspective: var(--dive-perspective, 1100px);
+    perspective-origin: 50% 50%;
+    pointer-events: none;
+    z-index: 10;
+    transform-style: preserve-3d;
+    display: none;
+}
+[data-diving] .dive-scene { display: block; }
+.dive-overlay {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    transform: translate3d(var(--dive-pan-x, 0px), var(--dive-pan-y, 0px), var(--dive-camera-z, 0px))
+        rotateX(var(--dive-pitch, 0deg)) rotateY(var(--dive-yaw, 0deg)) translateY(var(--dive-scroll, 0px));
+}
+.dive-surface {
+    position: absolute;
+    transform-style: preserve-3d;
+    transform: translateZ(calc(var(--dive) * var(--surface-depth)));
+}
+.dive-surface::before, .dive-surface::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border: 1px solid #6bc6e855;
+    transform: translateZ(calc(var(--dive) * -95px));
+    background: repeating-linear-gradient(0deg, transparent 0 25px, #80c8e30b 25px 26px),
+        repeating-linear-gradient(90deg, transparent 0 25px, #80c8e30b 25px 26px);
+}
+.dive-surface::after { inset: -10px; border-color: #c393cd30; transform: translateZ(calc(var(--dive) * -145px)); }
+.dive-plane { position: absolute; inset: 0; transform-style: preserve-3d; }
+.dive-plane > * { opacity: var(--dive) !important; }
+.dive-base { opacity: 1; }
+.dive-portrait::before, .dive-portrait::after { display: none; }
+.dive-type::before, .dive-type::after { border-style: dashed; }
+.dive-type .profile-copy h1 { margin-bottom: 24px; }
+.dive-type, .dive-navigation { text-shadow: calc(var(--dive-split) * -.25) 0 #f6639366, calc(var(--dive-split) * .25) 0 #46c9ec66; }
+.dive-card-backing {
+    position: absolute; inset: 0; border: 1px solid #9cbeb455; border-radius: 5px;
+    background: #10251ff5; opacity: var(--dive);
+}
+.dive-project::before, .dive-project::after { background: none; }
+.dive-piece {
+    position: absolute; opacity: var(--dive); backface-visibility: visible;
+    transform-style: preserve-3d;
+    transform: translateZ(calc(var(--dive) * var(--piece-depth)));
+    text-shadow: -1px 0 #f3658544, 1px 0 #5aaeff44, 0 .5px #72e7ad22;
+}
+.dive-piece-image { outline: 1px solid #72e7ad33; }
+.dive-piece-image::before, .dive-piece-image::after {
+    content: ''; position: absolute; inset: -1px; border: 1px solid #f3658566;
+    border-radius: 5px; pointer-events: none;
+    transform: translate3d(calc(var(--dive) * -1.5px), 0, calc(var(--dive) * -3px));
+}
+.dive-piece-image::after {
+    border-color: #5aaeff66;
+    transform: translate3d(calc(var(--dive) * 1.5px), 0, calc(var(--dive) * 3px));
+}
+.dive-piece-image .gallery-preview { border-radius: 5px; }
+.dive-piece-image img { filter: none; transition: none; }
+.dive-piece-title { text-shadow: -1.25px 0 #f3658555, 1.25px 0 #5aaeff55; }
+.dive-piece .gallery-date { color: #84d8ef; }
+.dive-collection .dive-base, .dive-navigation .dive-base { opacity: 1; transform-style: preserve-3d; }
+.dive-collection .collection-heading, .dive-collection h2, .dive-collection fieldset,
+.dive-collection button, .dive-letter-line { transform-style: preserve-3d; }
+.dive-letter-line { display: inline-flex; }
+.dive-letter-line > span {
+    display: inline-block;
+    transform: translateZ(calc(var(--dive) * var(--letter-depth))) rotateY(calc(var(--dive) * -12deg));
+    text-shadow: 0 5px 15px #49cce744;
+}
+.dive-collection .dive-base { transform: translateZ(calc(var(--dive) * 80px)); }
+.dive-navigation .gallery-header, .dive-navigation nav, .dive-navigation .social-links { transform-style: preserve-3d; }
+.dive-navigation .gallery-signature { transform: translateZ(calc(var(--dive) * 85px)); }
+.dive-navigation nav > * { transform: translateZ(calc(var(--dive) * 45px)); }
+.dive-navigation::before, .dive-collection::before { border-color: #9c73e288; }
+.dive-periphery {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 12;
+    pointer-events: none;
+    opacity: calc(var(--dive) * .8);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    background: radial-gradient(ellipse at var(--dive-focus-x, 50%) var(--dive-focus-y, 50%), transparent 22%, #07102422 58%, #da277b33 100%);
+    mask-image: radial-gradient(ellipse at var(--dive-focus-x, 50%) var(--dive-focus-y, 50%), transparent 12%, #0008 38%, #000 72%);
+    -webkit-mask-image: radial-gradient(ellipse at var(--dive-focus-x, 50%) var(--dive-focus-y, 50%), transparent 12%, #0008 38%, #000 72%);
+}
+.dive-periphery::after {
+    content: ''; position: absolute; inset: 0;
+    opacity: var(--dive-rush, 0);
+    background: repeating-conic-gradient(from 0deg at var(--dive-focus-x, 50%) var(--dive-focus-y, 50%), #88c5ff44 0deg .25deg, transparent .25deg 7deg);
+}
+[data-diving] .dive-periphery { display: block; }
+.dive-hint {
+    display: none; position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+    z-index: 16; pointer-events: none; color: #d3e6f5b3; font: 10px/1.4 monospace;
+    letter-spacing: .08em; text-align: center; opacity: 1;
+}
+[data-diving] .dive-hint { display: block; }
+@media(prefers-reduced-motion: reduce) {
+    .dive-scene { perspective: 5000px; }
+    [data-diving] .dive-periphery, [data-diving] .dive-hint { display: none; }
+    .dive-surface { --surface-depth: 0px !important; }
+    .dive-plane, .dive-piece { transform: none; }
+    .dive-letter-line > span, .dive-navigation .gallery-signature, .dive-navigation nav > * { transform: none; }
+}
+
 .landing-intro .profile-intro {
     gap: 56px;
     padding: 64px 0 96px
