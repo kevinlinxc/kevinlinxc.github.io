@@ -6,7 +6,7 @@ import Link from 'next/link';
 import SocialLinks from './SocialLinks';
 import TideField from './TideField';
 import {useScaffoldDive} from './useScaffoldDive';
-import {projectHref,projects} from './projects';
+import {projects} from './projects';
 export default function Home(){
  const {root,overlay,dive,active,toggle}=useScaffoldDive();
  const [badAppleOnly,setBadAppleOnly]=useState(false);
@@ -28,11 +28,11 @@ export default function Home(){
    <output className="sr-only">{visibleProjects.length} projects shown{badAppleOnly?', filtered to Bad Apple':''}</output>
    <div className="project-grid">{visibleProjects.map((project)=><article key={project.name} className="gallery-card" data-field-card>
      <div className="gallery-card-main">
-     <Link href={projectHref(project)} className="gallery-card-link">
+     <div className="gallery-card-body">
      {project.image?<div className={`gallery-preview${project.imageFit==='contain'?' gallery-preview-contain':''}`}><Image src={project.image} alt={project.alt} fill sizes="(max-width: 700px) 90vw, (max-width: 1050px) 45vw, 360px" unoptimized/></div>:<div className="gallery-preview film-preview" aria-hidden="true"><span>{project.name}</span></div>}
      <div className="gallery-card-copy"><p className="gallery-date">{project.date.label}</p><h3>{project.name}</h3><p className="gallery-description">{project.description}</p>{project.note&&<p className="gallery-project-note">{project.note}</p>}</div>
-     </Link>
-     {/^https?:/.test(project.url)?<a className="gallery-card-action" href={project.url} target="_blank" rel="noreferrer">{project.link}<ArrowUpRight size={16}/></a>:<Link className="gallery-card-action" href={projectHref(project)}>{project.link}<ArrowUpRight size={16}/></Link>}
+     </div>
+     {/^https?:/.test(project.url)?<a className="gallery-card-action" href={project.url} target="_blank" rel="noreferrer">{project.link}<ArrowUpRight size={16}/></a>:<Link className="gallery-card-action" href={project.url}>{project.link}<ArrowUpRight size={16}/></Link>}
      </div>
     {project.clips&&<ul className="gallery-clips">{project.clips.map(clip=><li key={clip.url}><a href={clip.url} target="_blank" rel="noreferrer">{clip.name}<ArrowUpRight size={13}/></a></li>)}</ul>}
    </article>)}</div>

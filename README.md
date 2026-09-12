@@ -6,8 +6,9 @@ behind it, plus dedicated engineering and writing sections.
 
 ## Overview
 
-- `/` - homepage grid of projects with an All / Bad Apple filter.
-- `/projects/<slug>` - a page per project.
+- `/` - homepage grid of projects with an All / Bad Apple filter. Cards link out to
+  the work itself; only the card's action link is clickable (the rest is 3D-mode drag
+  space), and there are no per-project pages.
 - `/engineering` - UBC AeroDesign and UBC Rover write-ups.
 - `/writing` - technical notes, migrated from the previous site.
 
@@ -65,9 +66,9 @@ npm run start
 ## Project structure
 
 ```
-app/            Routes and UI (homepage, projects, engineering, writing, field)
+app/            Routes and UI (homepage, engineering, writing, field)
 content/        Markdown source for engineering and writing
-scripts/        build-content.mjs - Markdown to generatedContent.ts
+scripts/        build-content.ts - Markdown to generatedContent.ts
 public/         Static assets, CNAME, .nojekyll
 ```
 
