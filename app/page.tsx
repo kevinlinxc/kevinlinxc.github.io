@@ -1,5 +1,6 @@
 'use client';
 import {useState} from 'react';
+import AppleModeToggle from './AppleModeToggle';
 import {ArrowDown,ArrowUpRight} from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,13 +9,14 @@ import TideField from './TideField';
 import {useScaffoldDive} from './useScaffoldDive';
 import {projects} from './projects';
 export default function Home(){
- const {root,overlay,dive,active,toggle}=useScaffoldDive();
+ const {root,overlay,dive,active,pinned,toggle}=useScaffoldDive();
  const [badAppleOnly,setBadAppleOnly]=useState(false);
  const visibleProjects=projects.filter(project=>!badAppleOnly||project.badApple);
  return <main ref={root} id="top" className="tide-portfolio" data-tide-gallery>
   <div className="portfolio-field"><TideField dive={dive}/></div>
+  <AppleModeToggle active={active} onToggle={()=>toggle.current()}/>
   <div className="dive-periphery" aria-hidden="true"/>
-  <div className="dive-hint" aria-hidden="true">↑ ↓ edges to travel · release / Esc to return</div>
+  <div className="dive-hint" aria-hidden="true">↑ ↓ edges to travel · {pinned?'click':'release'} / Esc to return</div>
   <div className="dive-scene" aria-hidden="true" inert><div ref={overlay} className="dive-overlay"/></div>
   <div className="landing-intro">
   <header className="gallery-header"><a className="gallery-signature" href="#top" aria-label="Kevin Lin, back to the top">kl.</a><nav aria-label="Main navigation"><a href="#projects">Projects <ArrowDown size={14}/></a><Link href="/writing">Writing</Link><SocialLinks/></nav></header>
