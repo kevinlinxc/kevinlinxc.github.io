@@ -108,7 +108,7 @@ attribute vec3 aColor,aScatter;
 attribute float aPhase;
 varying vec3 vColor;
 varying float vAlpha;
-uniform float uRatio,uPortrait;
+uniform float uRatio,uPortrait,uPageScroll;
 ${field}
 vec4 projectPortraitDepth(vec3 world,vec2 flatPosition,float dive){
  float yaw=uOrbit.x*1.335177*dive,pitch=-uOrbit.y*1.335177*dive;
@@ -123,8 +123,11 @@ void main(){
  float t=clamp((uPortrait-.18-aPhase*.22)/.62,0.,1.);
  t=t*t*(3.-2.*t);
  float drift=sin(uTime*.6+aPhase*6.2831)*.018*t;
- vec2 home=position.xy*(1.+drift);
- vec3 world=mix(vec3(home,0.),aScatter,t);
+ vec2 base=position.xy*(1.+drift);
+ float scrollOffset=uPageScroll*2.;
+ vec2 home=base+vec2(0.,scrollOffset);
+ vec3 world=mix(vec3(base,0.),aScatter,t);
+ world.y+=scrollOffset;
  gl_Position=projectPortraitDepth(world,home,uPortrait);
  vColor=aColor;
  vAlpha=smoothstep(.02,.18,uPortrait);
@@ -165,7 +168,7 @@ export default function TideField({dive}:{dive?:RefObject<DiveState>}){
   video.addEventListener('loadedmetadata',ready);video.addEventListener('error',videoError);
   video.addEventListener('loadeddata',requestRender);video.addEventListener('seeked',requestRender);
   const filmTexture=new THREE.VideoTexture(video);filmTexture.minFilter=THREE.LinearFilter;filmTexture.magFilter=THREE.LinearFilter;
-  const uniforms={uTime:{value:0},uAspect:{value:1},uScroll:{value:0},uReady:{value:0},uCalm:{value:0},uStory:{value:0},uDive:{value:0},uEntry:{value:0},uOrbit:{value:new THREE.Vector2()},uCard:{value:new THREE.Vector4(8,8,.6,.4)},uResolve:{value:0},uPresence:{value:0},uPointer:{value:new THREE.Vector2()},uTypeCenter:{value:new THREE.Vector2()},uFilm:{value:filmTexture},uRatio:{value:1},uLayer:{value:0},uPortrait:{value:0}};
+  const uniforms={uTime:{value:0},uAspect:{value:1},uScroll:{value:0},uReady:{value:0},uCalm:{value:0},uStory:{value:0},uDive:{value:0},uEntry:{value:0},uOrbit:{value:new THREE.Vector2()},uCard:{value:new THREE.Vector4(8,8,.6,.4)},uResolve:{value:0},uPresence:{value:0},uPointer:{value:new THREE.Vector2()},uTypeCenter:{value:new THREE.Vector2()},uFilm:{value:filmTexture},uRatio:{value:1},uLayer:{value:0},uPortrait:{value:0},uPageScroll:{value:0}};
   const frontUniforms={...uniforms,uLayer:{value:1}};
   const camera=new THREE.Camera(),scene=new THREE.Scene();
   const geometry=new THREE.BufferGeometry(),depthGeometry=new THREE.BufferGeometry(),veilGeometry=new THREE.BufferGeometry();
@@ -197,7 +200,7 @@ export default function TideField({dive}:{dive?:RefObject<DiveState>}){
    const portraitMaterial=new THREE.ShaderMaterial({uniforms,vertexShader:portraitVertex,fragmentShader:portraitFragment,transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending});
    const portraitPoints=new THREE.Points(portraitGeometry,portraitMaterial);portraitPoints.frustumCulled=false;portraitPoints.renderOrder=3;portraitPoints.visible=false;scene.add(portraitPoints);
    let portraitDiscX:Float32Array|null=null,portraitDiscY:Float32Array|null=null;
-   const portraitAnchor={x:0,y:0,rx:0,ry:0};
+   const portraitAnchor={x:0,y:0,rx:0,ry:0,scroll:0};
    const applyAnchor=()=>{
     if(!portraitDiscX||!portraitDiscY)return;
     const count=portraitDiscX.length,positions=new Float32Array(count*3);
@@ -212,6 +215,7 @@ export default function TideField({dive}:{dive?:RefObject<DiveState>}){
     portraitAnchor.y=1-(bounds.top+bounds.height/2)/height*2;
     portraitAnchor.rx=bounds.width/2*(2/width)*aspect;
     portraitAnchor.ry=bounds.height/2*(2/height);
+    portraitAnchor.scroll=window.scrollY;
     applyAnchor();
    };
    const portraitImage=new Image();
@@ -295,6 +299,7 @@ export default function TideField({dive}:{dive?:RefObject<DiveState>}){
    const diveAmount=depth?.amount??0,portraitAmount=depth?.portrait??diveAmount;
    uniforms.uDive.value=diveAmount*(frozen?.12:1);
    uniforms.uPortrait.value=portraitAmount*(frozen?.12:1);
+   uniforms.uPageScroll.value=(window.scrollY-portraitAnchor.scroll)/Math.max(1,height);
    uniforms.uEntry.value=depth?.entry??0;
    uniforms.uOrbit.value.set(depth?.x??0,depth?.y??0);
    const inDepth=uniforms.uDive.value>.001;

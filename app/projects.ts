@@ -7,8 +7,8 @@ const projectEntries: Project[] = [
     "description": "(In Progress) Making Bad Apple but with Strava GPS data.",
     "url": "https://www.instagram.com/reel/DcWgIfHJS_I/",
     "link": "Video",
-    "image": null,
-    "alt": "",
+    "image": "/assets/projects/bad-apple-strava.webp",
+    "alt": "Bad Apple but it's Strava",
     "note": "The repository will be public once the project is finished.",
     "clips": [
       {
@@ -41,10 +41,23 @@ const projectEntries: Project[] = [
     }
   },
   {
+    "name": "Bad Apple but its Kitkat",
+    "description": "Bad Apple!!, recreated as an animation in Blender.",
+    "url": "https://x.com/linguinelabs/status/2041314933443620935?s=46",
+    "link": "Video",
+    "image": "/assets/projects/bad-apple-kitkat.webp",
+    "alt": "Bad Apple but its Kitkat",
+    "badApple": true,
+    "date": {
+      "label": "April 2026",
+      "sort": 20260406
+    }
+  },
+  {
     "name": "Vim Vim Revolution",
     "description": "A rhythm game where you have to type the lyrics in time while navigating a vim editor.",
     "url": "https://github.com/kevinlinxc/vim-vim-revolution",
-    "link": "Play the game",
+    "link": "Play the game",  
     "image": "/assets/projects/vim-vim-revolution.webp",
     "alt": "Vim Vim Revolution logo",
     "date": {
@@ -61,8 +74,26 @@ const projectEntries: Project[] = [
     "alt": "Bad Apple but it's made of lyrics",
     "badApple": true,
     "date": {
-      "label":  "Mar 2026",
+      "label":  "March 2026",
       "sort": 20260329
+    }
+  },
+    {
+    "name": "Smart Glasses Laser Tag",
+    "description": "Hilarious hackathon project where we used Smart Glasses with cameras to play laser tag with finger guns.",
+    "url": "https://x.com/caydengineer/status/1994585871820230984?s=46",
+    "link": "Video",
+    "image": "/assets/projects/smart-glasses-laser-tag.webp",
+    "alt": "Smart Glasses Laser Tag project",
+    "clips": [
+      {
+        "name": "GitHub",
+        "url": "https://github.com/MatthewTran22/MentraLaunchHack"
+      }
+    ],
+    "date": {
+      "label": "November 2025",
+      "sort": 20251128
     }
   },
   {
@@ -132,6 +163,18 @@ const projectEntries: Project[] = [
       "sort": 20241223
     }
   },
+   {
+    "name": "Pixel Brush",
+    "description": "A League of Legends game I made where you guess pixelated Champion Portraits",
+    "url": "https://kevinlinxc.github.io/pixel-brush/",
+    "link": "Play Now",
+    "image": "/assets/projects/pixel-brush.webp",
+    "alt": "Pixel Brush LoL game",
+    "date": {
+      "label": "October 2024",
+      "sort": 20241022
+    }
+  }, 
   {
     "name": "Ultrasonic Holography",
     "description": "Our capstone project: pushing the open-source frontier of ultrasonic array levitation.",
@@ -158,7 +201,7 @@ const projectEntries: Project[] = [
     }
   },
   {
-    "name": "Bad Apple with apples",
+    "name": "Bad Apple with Apples",
     "badApple": true,
     "description": "Stop motion Bad Apple with 700 plastic apples in my living room",
     "url": "https://www.youtube.com/watch?v=lT-fdnIK0k0",
@@ -258,7 +301,7 @@ const projectEntries: Project[] = [
   },
   {
     "name": "Northernlion Edits",
-    "description": "Edits I made of Northernlion's content.",
+    "description": "Edits I made of famous bald gamer Northernlion's content.",
     "url": "https://youtube.com/playlist?list=PL2FEA11Ym8EMiM2s7vQZWy8Kjzf-eU9MY",
     "link": "Playlist",
     "image": "/assets/projects/northernlion-edits.webp",

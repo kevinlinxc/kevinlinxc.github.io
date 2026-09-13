@@ -69,6 +69,8 @@ a:focus-visible {
     color: #071410
 }
 
+@keyframes portfolio-in{from{opacity:0}to{opacity:1}}.tide-portfolio{animation:portfolio-in .7s ease both}
+
 .tide-back,
 .tide-front {
     position: absolute;
@@ -1305,4 +1307,22 @@ html {
     .doc-body h3 {
         font-size: 22px
     }
+}
+
+.apple-mode-toggle {
+    position: fixed; right: max(22px, env(safe-area-inset-right)); bottom: max(20px, env(safe-area-inset-bottom));
+    z-index: 30; display: grid; place-items: center; padding: 0; border: 0; background: none; color: #e2ecdf;
+    cursor: pointer !important; touch-action: manipulation;
+}
+.apple-mode-toggle:hover { color: #ffffff; }
+.apple-mode-toggle:focus-visible { outline: 2px solid #b3e7d8; outline-offset: 4px; border-radius: 6px; }
+.apple-mode-toggle * { cursor: pointer !important; }
+.apple-mode-icon { position: relative; display: block; width: 32px; height: 32px; pointer-events: none; }
+.apple-mode-icon > span { position: absolute; inset: 0; background: currentColor; transition: opacity .16s; }
+.apple-mode-whole { mask: url('/assets/apple-whole.svg') center / contain no-repeat; }
+.apple-mode-eaten { mask: url('/assets/apple-eaten.svg') center / contain no-repeat; opacity: 0; }
+.apple-mode-toggle[aria-pressed='true'] .apple-mode-whole { opacity: 0; }
+.apple-mode-toggle[aria-pressed='true'] .apple-mode-eaten { opacity: 1; }
+@media(prefers-reduced-motion: reduce) {
+    .apple-mode-toggle, .apple-mode-icon > span { transition: none; }
 }
