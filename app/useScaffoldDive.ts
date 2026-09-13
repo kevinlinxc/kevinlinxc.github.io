@@ -109,8 +109,6 @@ export function useScaffoldDive(){
    style(scene,'--dive-perspective',`${1100-480*s.amount}px`);
    style(scene,'--dive-split',`${s.amount*(9+s.speed*22+12*s.entry)*strength}px`);
    style(scene,'--dive-glitch',`${Math.sin(now*.012)*s.speed*s.amount*strength*8}px`);
-   style(periphery,'--dive-focus-x',`${mouseX*100}%`);
-   style(periphery,'--dive-focus-y',`${mouseY*100}%`);
    style(periphery,'--dive',s.amount.toFixed(3));
    style(periphery,'--dive-rush',String((s.entry*.8+Math.min(1,s.travel+s.speed)*.4)*strength));
    copies.forEach((_,node)=>{style(node,'opacity',(node.classList.contains('profile-portrait')?1-smoothstep(.05,.42,s.portrait):1-s.amount).toFixed(3));});
