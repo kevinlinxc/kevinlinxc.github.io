@@ -39,6 +39,6 @@ export default function Home(){
     {project.clips&&<ul className="gallery-clips">{project.clips.map(clip=><li key={clip.url}><a href={clip.url} target="_blank" rel="noreferrer">{clip.name}<ArrowUpRight size={13}/></a></li>)}</ul>}
    </article>)}</div>
   </section>
-  <footer className="gallery-footer"><span>Kevin Lin</span><div><a href="https://www.youtube.com/@linguinelabs" target="_blank" rel="noreferrer">YouTube <ArrowUpRight size={13}/></a><Link href="/engineering">Engineering</Link><Link href="/writing">Writing</Link><a href="#top">Back to top ↑</a></div></footer>
+  <footer className="gallery-footer"><span>Kevin Lin</span><div><a href="#projects">Projects</a><Link href="/writing">Writing</Link><a href="#top">Back to Top ↑</a></div></footer>
  </main>;
 }
