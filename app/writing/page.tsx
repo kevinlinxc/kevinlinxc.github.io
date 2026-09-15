@@ -54,7 +54,11 @@ export default function WritingIndex() {
       </section>
       <footer className="gallery-footer">
         <span>Kevin Lin</span>
-        <Link href="/#top">Back to top ↑</Link>
+        <div>
+          <Link href="/#projects">Projects</Link>
+          <Link href="/writing">Writing</Link>
+          <Link href="/#top">Back to Top ↑</Link>
+        </div>
       </footer>
     </main>
   );
