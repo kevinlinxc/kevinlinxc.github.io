@@ -17,7 +17,7 @@ export function useScaffoldDive(){
   let target=0,tx=0,ty=0,energy=0,frame=0,last=performance.now(),pointerId:number|null=null;
   let originX=0,originY=0,mouseX=.5,mouseY=.5,dragging=false,pinned=false,suppressUntil=0,disposed=false;
   let intro=false,introStart=0,introModeFrame=0,introTimer:ReturnType<typeof setTimeout>|undefined,exitStart=0,exitAmount=0,exitDuration=220,exitPortraitFrom=0,exitPortraitDuration=720;
-  let layoutDirty=false,maxScroll=0;
+  let layoutDirty=true,maxScroll=0;
   const scene=layer.parentElement!,periphery=page.querySelector<HTMLElement>('.dive-periphery')!;
   const styleCache=new WeakMap<HTMLElement,Map<string,string>>();
   const style=(node:HTMLElement,key:string,value:string)=>{
@@ -33,7 +33,9 @@ export function useScaffoldDive(){
   };
   const copies=new Map<HTMLElement,{surface:HTMLDivElement;opacity:string}>();
   const clear=()=>{copies.forEach(({surface,opacity},node)=>{node.style.opacity=opacity;styleCache.delete(node);surface.remove();});copies.clear();};
+  const restore=()=>{copies.forEach(({opacity},node)=>{node.style.opacity=opacity;styleCache.delete(node);});};
   const capture=()=>{
+   layoutDirty=false;
    // Read document-space geometry once on entry/resize, never during scroll travel.
    const scroll=window.scrollY;
    const boxes=[...page.querySelectorAll<HTMLElement>('[data-field-card],.profile-portrait,.profile-copy,.gallery-header,.collection-heading,.gallery-footer')]
@@ -42,6 +44,7 @@ export function useScaffoldDive(){
     })).filter(({rect})=>rect.width>0);
    maxScroll=Math.max(0,document.documentElement.scrollHeight-innerHeight);
    clear();
+   const fragment=document.createDocumentFragment();
    for(const {node,rect,pieces} of boxes){
     const portrait=node.classList.contains('profile-portrait'),type=node.classList.contains('profile-copy'),card=node.hasAttribute('data-field-card');
     const heading=node.classList.contains('collection-heading'),header=node.classList.contains('gallery-header');
@@ -71,8 +74,9 @@ export function useScaffoldDive(){
      Object.assign(copy.style,{width:'100%',height:'100%',margin:'0',transform:'none',opacity:'1',flex:'none'});
      plane.appendChild(copy);surface.appendChild(plane);
     }
-    layer.appendChild(surface);copies.set(node,{surface,opacity:node.style.opacity});
+    fragment.appendChild(surface);copies.set(node,{surface,opacity:node.style.opacity});
    }
+   layer.appendChild(fragment);
   };
   const draw=(now:number)=>{
    frame=0;if(disposed)return;
@@ -98,17 +102,11 @@ export function useScaffoldDive(){
    s.travel+=(Math.abs(nextScroll-window.scrollY)/Math.max(dt, .001)/innerHeight-s.travel)*k;
    if(Math.abs(nextScroll-window.scrollY)>.1){window.scrollTo({top:nextScroll,behavior:'instant'});}
    if(layoutDirty&&s.amount>.001){capture();layoutDirty=false;}
-   if(!target&&s.amount<.002&&s.portrait<.002){s.amount=0;s.portrait=0;s.x=0;s.y=0;s.speed=0;s.entry=0;s.travel=0;clear();page.removeAttribute('data-diving');page.removeAttribute('data-dive-exiting');page.removeAttribute('data-dive-intro');s.exiting=false;}
+   if(!target&&s.amount<.002&&s.portrait<.002){s.amount=0;s.portrait=0;s.x=0;s.y=0;s.speed=0;s.entry=0;s.travel=0;restore();page.removeAttribute('data-diving');page.removeAttribute('data-dive-exiting');page.removeAttribute('data-dive-intro');s.exiting=false;}
    style(scene,'--dive',s.amount.toFixed(3));
-   style(scene,'--dive-scroll',`${(-window.scrollY).toFixed(1)}px`);
-   style(scene,'--dive-yaw',`${s.x*s.amount*strength*76.5}deg`);
-   style(scene,'--dive-pitch',`${-s.y*s.amount*strength*76.5}deg`);
-   style(scene,'--dive-pan-x',`${s.x*s.amount*strength*45}px`);
-   style(scene,'--dive-pan-y',`${s.y*s.amount*strength*35}px`);
-   style(scene,'--dive-camera-z',`${(-170*s.amount-240*s.entry)*strength}px`);
-   style(scene,'--dive-perspective',`${1100-480*s.amount}px`);
-   style(scene,'--dive-split',`${s.amount*(9+s.speed*22+12*s.entry)*strength}px`);
-   style(scene,'--dive-glitch',`${Math.sin(now*.012)*s.speed*s.amount*strength*8}px`);
+   // Camera transforms belong to the camera, not inherited variables on every card.
+   style(layer,'transform',`translate3d(${s.x*s.amount*strength*45}px,${s.y*s.amount*strength*35}px,${(-170*s.amount-240*s.entry)*strength}px) rotateX(${-s.y*s.amount*strength*76.5}deg) rotateY(${s.x*s.amount*strength*76.5}deg) translateY(${-window.scrollY}px)`);
+   style(scene,'perspective',`${reduced.matches?5000:1100-480*s.amount}px`);
    style(periphery,'--dive',s.amount.toFixed(3));
    style(periphery,'--dive-rush',String((s.entry*.8+Math.min(1,s.travel+s.speed)*.4)*strength));
    copies.forEach((_,node)=>{style(node,'opacity',(node.classList.contains('profile-portrait')?1-smoothstep(.05,.42,s.portrait):1-s.amount).toFixed(3));});
@@ -118,7 +116,7 @@ export function useScaffoldDive(){
   const stopIntro=()=>{clearTimeout(introTimer);intro=false;page.removeAttribute('data-dive-intro');};
   const enter=()=>{
    stopIntro();page.removeAttribute('data-dive-exiting');dive.current.exiting=false;
-   if(!target){capture();page.setAttribute('data-diving','true');}
+   if(!target){if(layoutDirty||!copies.size)capture();page.setAttribute('data-diving','true');}
    setActive(true);target=1;wake();window.dispatchEvent(new Event('portfolio-dive'));
   };
   const leave=(duration=220)=>{
@@ -162,7 +160,9 @@ export function useScaffoldDive(){
   const cancel=()=>{end();leave();};
   const keys=(e:KeyboardEvent)=>{if(e.key==='Escape')cancel();};
   const onScroll=()=>{if(intro)leave();if(target||dive.current.amount>.001||dive.current.portrait>.001)wake();};
-  const update=()=>{if(target||dive.current.amount>.001||dive.current.portrait>.001){layoutDirty=true;wake();}};
+  const update=()=>{layoutDirty=true;if(target||dive.current.amount>.001||dive.current.portrait>.001)wake();};
+  const layoutObserver=new ResizeObserver(update);layoutObserver.observe(page);
+  void document.fonts.ready.then(()=>{if(!disposed)update();});
   const nativeDrag=(e:DragEvent)=>e.preventDefault();
   const visibility=()=>{if(document.hidden)cancel();};
   page.addEventListener('pointerdown',down);window.addEventListener('pointermove',move,{passive:false});window.addEventListener('pointerup',end);window.addEventListener('pointercancel',cancel);
@@ -177,7 +177,7 @@ export function useScaffoldDive(){
     introModeFrame=requestAnimationFrame(()=>{if(intro)setActive(true);});
     introTimer=setTimeout(()=>leave(900),2100);
   }
-  return()=>{disposed=true;clearTimeout(introTimer);cancelAnimationFrame(introModeFrame);cancelAnimationFrame(frame);clear();toggle.current=()=>{};
+  return()=>{disposed=true;layoutObserver.disconnect();clearTimeout(introTimer);cancelAnimationFrame(introModeFrame);cancelAnimationFrame(frame);clear();toggle.current=()=>{};
    Object.assign(state,{amount:0,x:0,y:0,entry:0,speed:0,travel:0,portrait:0,exiting:false});
    page.removeAttribute('data-diving');page.removeAttribute('data-dive-exiting');page.removeAttribute('data-dive-intro');
    page.removeEventListener('pointerdown',down);window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',end);window.removeEventListener('pointercancel',cancel);page.removeEventListener('click',click,true);page.removeEventListener('dragstart',nativeDrag);window.removeEventListener('keydown',keys);window.removeEventListener('blur',cancel);window.removeEventListener('resize',update);window.removeEventListener('scroll',onScroll);document.removeEventListener('visibilitychange',visibility);
