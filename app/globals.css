@@ -69,7 +69,7 @@ a:focus-visible {
     color: #071410
 }
 
-@keyframes portfolio-in{from{opacity:0}to{opacity:1}}.tide-portfolio{animation:portfolio-in .7s ease both}
+/* Never fade the full document: opacity flattens the 3D tree into a huge surface. */
 
 .tide-back,
 .tide-front {
@@ -641,7 +641,7 @@ html {
     text-shadow: -1px 0 #f3658544, 1px 0 #5aaeff44, 0 .5px #72e7ad22;
 }
 /* Held frames, with independent phases; all pieces remain parallel to their cards. */
-[data-diving]:not([data-dive-exiting]):not([data-dive-intro]) .dive-piece {
+[data-diving]:not([data-dive-exiting]) .dive-piece {
     animation: depth-stutter 3.6s steps(1, end) infinite;
     animation-delay: var(--piece-phase, 0s);
 }
@@ -701,24 +701,18 @@ html {
     opacity: var(--dive-rush, 0);
     background: repeating-conic-gradient(from 0deg at 50% 50%, #88c5ff44 0deg .25deg, transparent .25deg 7deg);
 }
+.dive-edge { display: none; }
 [data-diving] .dive-periphery { display: block; }
-.dive-hint {
-    display: none; position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
-    z-index: 16; pointer-events: none; color: #d3e6f5b3; font: 10px/1.4 monospace;
-    letter-spacing: .08em; text-align: center; opacity: 1;
-}
-[data-diving] .dive-hint { display: block; }
 [data-dive-exiting] .dive-surface::before,
 [data-dive-exiting] .dive-surface::after,
 [data-dive-exiting] .dive-piece-image::before,
 [data-dive-exiting] .dive-piece-image::after { visibility: hidden; }
 [data-dive-exiting] .dive-piece-image { outline: none; }
 [data-dive-exiting] .dive-card-backing { border-color: transparent; }
-[data-dive-exiting] .dive-hint, [data-dive-intro] .dive-hint { display: none; }
 @media(prefers-reduced-motion: reduce) {
     [data-diving] .dive-piece { animation: none !important; }
     .dive-scene { perspective: 5000px; }
-    [data-diving] .dive-periphery, [data-diving] .dive-hint { display: none; }
+    [data-diving] .dive-periphery { display: none; }
     .dive-surface { --surface-depth: 0px !important; }
     .dive-plane, .dive-piece { transform: none; }
     .dive-letter-line > span, .dive-navigation .gallery-signature, .dive-navigation nav > * { transform: none; }
@@ -746,6 +740,35 @@ html {
 
 .landing-intro .profile-copy>p {
     font-size: clamp(1rem, 1.5vw, 1.25rem)
+}
+
+/* Keep the cue outside layout so the original portrait/text centering stays intact.
+   The anchor spans the full intro row so the cue lands on the screen center. */
+.depth-cue-anchor { position: absolute; left: 0; right: 0; height: 0; }
+.depth-cue {
+    position: absolute; top: 30px; left: 50%; transform: translateX(-50%);
+    display: inline-flex; width: 72px; height: 76px;
+    margin: 0; padding: 0;
+    cursor: grab; touch-action: none;
+    border-radius: 4px;
+}
+.depth-cue-gesture { position: relative; width: 72px; height: 76px; pointer-events: none; }
+.depth-cue-ripple {
+    position: absolute; left: 50%; top: 50%; width: 26px; height: 26px;
+    margin: -13px 0 0 -13px;
+    border: 1.5px solid #a8e5cf; border-radius: 50%; opacity: 0;
+    animation: cue-ripple 2.6s ease-out .2s 1;
+}
+.depth-cue-ripple + .depth-cue-ripple { animation-delay: 1.4s; }
+@keyframes cue-ripple {
+    0% { opacity: 0; transform: translateY(0) scale(.25); }
+    14% { opacity: .28; }
+    100% { opacity: 0; transform: translateY(24px) scale(3.6); }
+}
+[data-diving] .depth-cue { visibility: hidden; }
+[data-diving] .depth-cue-ripple { animation: none; }
+@media(prefers-reduced-motion: reduce) {
+    .depth-cue-ripple { animation: none; }
 }
 
 .landing-intro+.project-collection {
@@ -1340,3 +1363,24 @@ html {
 }
 [data-render-quality="1"] .dive-piece:not(.dive-piece-image):not(.dive-piece-title),
 [data-render-quality="2"] .dive-piece:not(.dive-piece-image):not(.dive-piece-title) { animation: none !important; }
+
+/* Phone compositors blur only small edge strips, never a full-screen backdrop.
+   The transparent center has no blur surface at all. */
+[data-touch-scene] .dive-periphery {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    mask-image: none;
+    -webkit-mask-image: none;
+}
+[data-touch-scene] .dive-edge {
+    display: block; position: absolute;
+    backdrop-filter: blur(8px) brightness(1.3) saturate(1.35);
+    -webkit-backdrop-filter: blur(8px) brightness(1.3) saturate(1.35);
+}
+.dive-edge-left, .dive-edge-right { top: 0; bottom: 0; width: 14%; }
+.dive-edge-left { left: 0; mask-image: linear-gradient(to right, #000, transparent); -webkit-mask-image: linear-gradient(to right, #000, transparent); }
+.dive-edge-right { right: 0; mask-image: linear-gradient(to left, #000, transparent); -webkit-mask-image: linear-gradient(to left, #000, transparent); }
+.dive-edge-top, .dive-edge-bottom { left: 0; right: 0; height: 16%; }
+.dive-edge-top { top: 0; mask-image: linear-gradient(to bottom, #000, transparent); -webkit-mask-image: linear-gradient(to bottom, #000, transparent); }
+.dive-edge-bottom { bottom: 0; mask-image: linear-gradient(to top, #000, transparent); -webkit-mask-image: linear-gradient(to top, #000, transparent); }
+[data-touch-scene][data-render-quality="2"] .dive-edge { backdrop-filter: none; -webkit-backdrop-filter: none; }

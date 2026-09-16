@@ -59,7 +59,8 @@ npm run start
 | `npm run dev` | Start the local dev server. |
 | `npm run content` | Regenerate `app/generatedContent.ts` from `content/`. |
 | `npm run build` | Content build + static production export. |
-| `npm run start` | Preview the built output. |
+| `npm run start` | Build and preview the static export with Wrangler. |
+| `npm run deploy` | Build and deploy static assets to Cloudflare. |
 | `npm run lint` | Lint with oxlint. |
 | `npm run format` | Format with oxfmt. |
 
@@ -74,5 +75,25 @@ public/         Static assets, CNAME, .nojekyll
 
 ## Deployment
 
-Pushes to `main` are built by `.github/workflows/gh-pages.yml` and published to the
-`gh-pages` branch for GitHub Pages at `kevinlinxc.com`.
+Cloudflare deployment uses the root `wrangler.static.jsonc` to build and upload only
+`dist/client/`. Authenticate once with `npx wrangler login`, then deploy with:
+
+```bash
+npm run deploy
+```
+
+Wrangler runs `npm run build` automatically. To validate without publishing:
+
+```bash
+npm run deploy -- --dry-run
+```
+
+Keep `output: 'export'` in `next.config.ts` and `vinext()` in `vite.config.ts`.
+This static deployment does not need `@vinext/cloudflare`, a Worker `main`
+entrypoint, KV namespaces, or an Images binding. Keep the non-default filename:
+Vinext beta.5 treats a root `wrangler.jsonc` as a server deployment even for static
+exports. The npm scripts select `wrangler.static.jsonc` explicitly. Do not use a server deployment
+initializer for this site. The generated `dist/server` directory is not deployed.
+
+The existing `.github/workflows/gh-pages.yml` still publishes pushes to `main`
+to GitHub Pages. Disable that workflow when completing the domain migration.

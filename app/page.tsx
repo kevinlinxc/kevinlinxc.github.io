@@ -10,20 +10,25 @@ import {useScaffoldDive} from './useScaffoldDive';
 import {projects} from './projects';
 import {previewImages} from './previewImages';
 export default function Home(){
- const {root,overlay,dive,active,pinned,toggle}=useScaffoldDive();
+ const {root,overlay,dive,active,toggle}=useScaffoldDive();
  const [badAppleOnly,setBadAppleOnly]=useState(false);
  const visibleProjects=projects.filter(project=>!badAppleOnly||project.badApple);
  return <main ref={root} id="top" className="tide-portfolio" data-tide-gallery>
   <div className="portfolio-field"><TideField dive={dive}/></div>
   <AppleModeToggle active={active} onToggle={()=>toggle.current()}/>
-  <div className="dive-periphery" aria-hidden="true"/>
-  <div className="dive-hint" aria-hidden="true">↑ ↓ edges to travel · {pinned?'click':'release'} / Esc to return</div>
+  <div className="dive-periphery" aria-hidden="true"><i className="dive-edge dive-edge-left"/><i className="dive-edge dive-edge-right"/><i className="dive-edge dive-edge-top"/><i className="dive-edge dive-edge-bottom"/></div>
   <div className="dive-scene" aria-hidden="true" inert><div ref={overlay} className="dive-overlay"/></div>
   <div className="landing-intro">
   <header className="gallery-header"><a className="gallery-signature" href="#top" aria-label="Kevin Lin, back to the top">kl.</a><nav aria-label="Main navigation"><a href="#projects">Projects <ArrowDown size={14}/></a><Link href="/writing">Writing</Link><SocialLinks/></nav></header>
   <section className="profile-intro" aria-label="About Kevin Lin">
    <button type="button" className="profile-portrait" data-dive-trigger aria-label="Explore depth view. Drag to look around, or press Enter to toggle." aria-pressed={active} onClick={event=>{if(event.detail===0)toggle.current();}}><Image src="/assets/kevin-portrait-preview.webp" alt="Kevin Lin in front of the Golden Gate Bridge" fill sizes="(max-width: 1050px) 160px, 208px" priority unoptimized/></button>
-   <div className="profile-copy"><h1>Kevin Lin</h1><p>Engineer & Digital Creative</p></div>
+   <div className="profile-copy"><h1>Kevin Lin</h1><p>Engineer & Digital Creative</p>
+    <div className="depth-cue-anchor">
+    <button type="button" className="depth-cue" data-dive-trigger aria-label="Explore in 3D. Hold and drag, or press Enter to toggle." aria-pressed={active} onClick={event=>{if(event.detail===0)toggle.current();}}>
+     <span className="depth-cue-gesture" aria-hidden="true"><span className="depth-cue-ripple"/><span className="depth-cue-ripple"/></span>
+    </button>
+    </div>
+   </div>
   </section>
   </div>
   <section id="projects" className="project-collection" aria-labelledby="projects-heading">
