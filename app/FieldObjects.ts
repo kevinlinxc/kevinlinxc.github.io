@@ -309,37 +309,37 @@ export function createFieldObjects(){
  const rim=new THREE.DirectionalLight('#79c4fa',2.2);rim.position.set(550,100,-300);scene.add(rim);
  const material=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.43,metalness:.16,transparent:true});
  const specifications=[
-  {geometry:cube(),name:'Rubik’s cube',size:2.6,tilt:.3,spin:.19,phase:.55,gap:1.25,depth:-210,scale:1},
-  {geometry:camera(),name:'Canon Rebel T5i inspired camera',size:2.6,tilt:.14,spin:-.13,phase:-.35,gap:1.75,depth:-360,scale:1.1},
-  {geometry:piano(),name:'Piano keyboard',size:4.4,tilt:.70,spin:.10,phase:-.2,gap:1.4,depth:-190,scale:1.1},
-  {geometry:metagross(),name:'Metagross',size:3.8,tilt:.17,spin:-.09,phase:.3,gap:1.0,depth:-150,scale:1.25},
-  {geometry:endurance(),name:'Endurance',size:3.0,tilt:.25,spin:.10,phase:-.3,gap:2.0,depth:-430,scale:1.15},
-  {geometry:mako(),name:'Mako',size:2.0,tilt:.08,spin:-.10,phase:-.35,gap:1.45,depth:-280,scale:1},
-  {geometry:tesla(),name:'Red 2025 Model 3',size:4.6,tilt:.22,spin:.075,phase:.75,gap:1.15,depth:-170,scale:1.30},
+  {build:cube,name:'Rubik’s cube',size:2.6,tilt:.3,spin:.19,phase:.55,gap:1.25,depth:-210,scale:1},
+  {build:camera,name:'Canon Rebel T5i inspired camera',size:2.6,tilt:.14,spin:-.13,phase:-.35,gap:1.75,depth:-360,scale:1.1},
+  {build:piano,name:'Piano keyboard',size:4.4,tilt:.70,spin:.10,phase:-.2,gap:1.4,depth:-190,scale:1.1},
+  {build:metagross,name:'Metagross',size:3.8,tilt:.17,spin:-.09,phase:.3,gap:1.0,depth:-150,scale:1.25},
+  {build:endurance,name:'Endurance',size:3.0,tilt:.25,spin:.10,phase:-.3,gap:2.0,depth:-430,scale:1.15},
+  {build:mako,name:'Mako',size:2.0,tilt:.08,spin:-.10,phase:-.35,gap:1.45,depth:-280,scale:1},
+  {build:tesla,name:'Red 2025 Model 3',size:4.6,tilt:.22,spin:.075,phase:.75,gap:1.15,depth:-170,scale:1.30},
  ];
- const models=specifications.map(({geometry,name,...motion})=>{
-  const anchor=new THREE.Group(),mesh=new THREE.Mesh(geometry,material);
-  mesh.name=name;
-  anchor.add(mesh);documentSpace.add(anchor);return {anchor,mesh,...motion};
+ const models=specifications.map(({build,name,...motion})=>{
+  const anchor=new THREE.Group();documentSpace.add(anchor);
+  return {anchor,mesh:null as THREE.Mesh|null,build,name,...motion};
  });
- let width=1,height=1,ready=false,time=0,wasActive=false;
+ const frustum=new THREE.Frustum(),projection=new THREE.Matrix4(),sphere=new THREE.Sphere();
+ let width=1,height=1,ready=false,time=0,wasActive=false,lastPerspective=0;
  const layout=()=>{
   const grid=document.querySelector<HTMLElement>('.project-grid');if(!grid)return;
   const cards=[...grid.querySelectorAll<HTMLElement>('[data-field-card]')];if(!cards.length){ready=false;return;}
   const bounds=grid.getBoundingClientRect(),rows:number[]=[];
   for(const card of cards){const top=card.getBoundingClientRect().top+window.scrollY;if(!rows.some(row=>Math.abs(row-top)<4))rows.push(top);}
   const size=Math.min(180,Math.max(85,width*.145));
-  models.forEach(({anchor,mesh,size:modelSize,gap,depth,scale},index)=>{
+  models.forEach(({anchor,size:modelSize,gap,depth,scale},index)=>{
    const side=index%2===1?1:-1,x=side<0?bounds.left-size*gap:bounds.right+size*gap;
    const rowPosition=index*(rows.length-1)/Math.max(1,models.length-1);
    const row=Math.floor(rowPosition),blend=rowPosition-row;
    const rowTop=THREE.MathUtils.lerp(rows[row],rows[Math.min(row+1,rows.length-1)],blend);
    anchor.position.set(x-width/2,height/2-(rowTop+Math.min(230,size*1.3)),depth);
-   mesh.scale.setScalar(size*scale/modelSize);
+   anchor.scale.setScalar(size*scale/modelSize);
   });ready=true;
  };
  return {
-  resize(w:number,h:number){width=w;height=h;layout();},
+  resize(w:number,h:number){width=w;height=h;lastPerspective=0;layout();},
   layout,
   render(renderer:THREE.WebGLRenderer,depth:DiveState|undefined,dt:number,reduced:boolean){
    const amount=depth?.amount??0,active=amount>.01;
@@ -347,18 +347,30 @@ export function createFieldObjects(){
    if(!active||!ready)return;
    if(!reduced)time+=dt;
    const strength=reduced?.1:1,perspective=1100-480*amount;
-   cameraView.aspect=width/height;cameraView.fov=THREE.MathUtils.radToDeg(2*Math.atan(height/(2*perspective)));
-   cameraView.position.z=perspective;cameraView.updateProjectionMatrix();
+   if(perspective!==lastPerspective){
+    cameraView.aspect=width/height;cameraView.fov=THREE.MathUtils.radToDeg(2*Math.atan(height/(2*perspective)));
+    cameraView.position.z=perspective;cameraView.updateProjectionMatrix();lastPerspective=perspective;
+   }
    rig.position.set((depth?.x??0)*amount*strength*45,-(depth?.y??0)*amount*strength*35,(-170*amount-240*(depth?.entry??0))*strength);
    rig.rotation.set((depth?.y??0)*amount*strength*1.335177,(depth?.x??0)*amount*strength*1.335177,0,'XYZ');
    documentSpace.position.y=window.scrollY;
    material.opacity=THREE.MathUtils.smoothstep(amount,.04,.65);
-   models.forEach(({mesh,tilt,spin,phase},index)=>{
-    mesh.rotation.set(tilt+Math.sin(time*.27+index)*.12,mesh.name==='Endurance'?phase+Math.sin(time*.18)*.35:time*spin+phase,mesh.name==='Endurance'?time*spin:Math.sin(time*.18+index)*.10);
-    mesh.position.y=Math.sin(time*.5+index*2)*9;
+   scene.updateMatrixWorld();cameraView.updateMatrixWorld();
+   frustum.setFromProjectionMatrix(projection.multiplyMatrices(cameraView.projectionMatrix,cameraView.matrixWorldInverse));
+   let visible=0;
+   models.forEach((model,index)=>{
+    const {anchor,tilt,spin,phase,size,build,name}=model;
+    anchor.getWorldPosition(sphere.center);sphere.radius=size*anchor.scale.x+18;
+    // Build the original, full-detail geometry only when it can enter the view.
+    // No tessellation, merged-array allocation or upload for offscreen miniatures.
+    if(!frustum.intersectsSphere(sphere)){if(model.mesh)model.mesh.visible=false;return;}
+    if(!model.mesh){model.mesh=new THREE.Mesh(build(),material);model.mesh.name=name;anchor.add(model.mesh);}
+    const mesh=model.mesh;mesh.visible=true;visible++;
+    mesh.rotation.set(tilt+Math.sin(time*.27+index)*.12,name==='Endurance'?phase+Math.sin(time*.18)*.35:time*spin+phase,name==='Endurance'?time*spin:Math.sin(time*.18+index)*.10);
+    mesh.position.y=Math.sin(time*.5+index*2)*9/anchor.scale.x;
    });
-   renderer.autoClear=false;renderer.clearDepth();renderer.render(scene,cameraView);renderer.autoClear=true;
+   if(visible){renderer.autoClear=false;renderer.clearDepth();renderer.render(scene,cameraView);renderer.autoClear=true;}
   },
-  dispose(){models.forEach(({mesh})=>mesh.geometry.dispose());material.dispose();scene.clear();}
+  dispose(){models.forEach(({mesh})=>mesh?.geometry.dispose());material.dispose();scene.clear();}
  };
 }
