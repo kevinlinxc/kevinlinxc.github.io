@@ -38,3 +38,4 @@ tsconfig.tsbuildinfo
 /.wrangler/
 /outputs/
 /work/
+.vite/*
