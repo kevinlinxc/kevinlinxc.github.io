@@ -7,17 +7,25 @@ export const renderProfiles = [
  {pixelRatio:.8,pixels:700_000,spacing:10,columns:160,rows:108,glowScale:.20},
 ] as const;
 
-export type DeviceHints={coarse:boolean;hover:boolean;touchPoints:number;shortEdge:number;memory?:number};
+export type DeviceHints={coarse:boolean;hover:boolean;touchPoints:number;shortEdge:number;memory?:number;firefox?:boolean};
 export function devicePolicy(hints:DeviceHints){
- const touch=hints.coarse&&(!hints.hover||(hints.touchPoints>0&&hints.shortEdge<=900));
+ // Firefox reuses the entire mobile path — the smaller look sweep, the lighter
+ // edge-only compositor CSS and the reduced render budget — instead of a
+ // separate set of browser-specific tweaks.
+ const firefox=Boolean(hints.firefox);
+ const touch=firefox||(hints.coarse&&(!hints.hover||(hints.touchPoints>0&&hints.shortEdge<=900)));
  const constrained=touch||(hints.memory!==undefined&&hints.memory<=4);
- return {touch,constrained,initialTier:constrained?1:0,
+ return {touch,firefox,constrained,initialTier:constrained?1:0,
   lookLimit:touch?20/76.5:1,pixelRatio:constrained?1:1.25,pixels:constrained?600_000:1_800_000};
+}
+export function isFirefox(){
+ const style=typeof document!=='undefined'?document.documentElement.style:undefined;
+ return (typeof navigator!=='undefined'&&/firefox/i.test(navigator.userAgent))||Boolean(style&&'MozAppearance' in style);
 }
 export function currentDevicePolicy(){
  return devicePolicy({coarse:matchMedia('(pointer: coarse)').matches,hover:matchMedia('(hover: hover)').matches,
   touchPoints:navigator.maxTouchPoints,shortEdge:Math.min(innerWidth,innerHeight),
-  memory:(navigator as Navigator&{deviceMemory?:number}).deviceMemory});
+  memory:(navigator as Navigator&{deviceMemory?:number}).deviceMemory,firefox:isFirefox()});
 }
 
 // A generous window covers the entire 40-degree mobile camera sweep, including

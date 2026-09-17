@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
-import {createRenderQuality,renderProfiles,devicePolicy,withinDiveWindow} from '../app/renderQuality.ts';
+import {createRenderQuality,renderProfiles,devicePolicy,withinDiveWindow,isFirefox} from '../app/renderQuality.ts';
 const run=(quality,start,duration,interval,eligible=true)=>{
  for(let now=start;now<start+duration;now+=interval)quality.sample(now,eligible);
 };
@@ -42,6 +42,17 @@ test('desktop retains the full sweep and quality, including touchscreen laptops'
  assert.equal(policy.lookLimit,1);assert.equal(policy.initialTier,0);
  const lowMemory=devicePolicy({coarse:false,hover:true,touchPoints:0,shortEdge:1080,memory:4});
  assert.equal(lowMemory.touch,false);
+});
+test('Firefox takes the mobile path while other desktops stay full',()=>{
+ const firefox=devicePolicy({coarse:false,hover:true,touchPoints:0,shortEdge:1080,firefox:true});
+ assert.equal(firefox.firefox,true);assert.equal(firefox.touch,true);
+ assert.equal(firefox.initialTier,1);assert.ok(firefox.pixels<=600_000);
+ assert.equal(firefox.lookLimit*76.5*2,40);
+ const chrome=devicePolicy({coarse:false,hover:true,touchPoints:0,shortEdge:1080});
+ assert.equal(chrome.firefox,false);assert.equal(chrome.touch,false);
+ assert.equal(chrome.initialTier,0);assert.equal(chrome.lookLimit,1);
+ assert.equal(chrome.pixelRatio,1.25);
+ assert.equal(isFirefox(),false);
 });
 test('mobile layer window stays bounded as the portfolio grows and follows scrolling',()=>{
  const height=850,cardHeight=460;
