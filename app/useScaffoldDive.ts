@@ -104,7 +104,7 @@ export function useScaffoldDive(){
    s.entry=target?Math.sin(Math.PI*s.amount)*strength:0;
    // Downward travel starts in the bottom quarter; upward travel keeps its smaller edge zone.
    const edge=mouseY<.15?-Math.pow((.15-mouseY)/.15,2):mouseY>.75?Math.pow((mouseY-.75)/.25,2):0;
-   const velocity=target&&!reduced.matches&&!policy.touch?edge*innerHeight*2.7*s.amount:0;
+   const velocity=target&&!reduced.matches?edge*innerHeight*2.7*s.amount:0;
    const nextScroll=clamp(window.scrollY+velocity*dt,0,maxScroll);
    s.travel+=(Math.abs(nextScroll-window.scrollY)/Math.max(dt, .001)/innerHeight-s.travel)*k;
    if(Math.abs(nextScroll-window.scrollY)>.1){window.scrollTo({top:nextScroll,behavior:'instant'});}

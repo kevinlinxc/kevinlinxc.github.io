@@ -149,16 +149,16 @@ void main(){
 }`;
 
 export default function TideField({dive}:{dive?:RefObject<DiveState>}){
- const backHost=useRef<HTMLDivElement>(null),player=useRef<HTMLVideoElement|null>(null);
+ const backHost=useRef<HTMLDivElement>(null);
  const invalidate=useRef(()=>{});
- const [failed,setFailed]=useState(false),[blocked,setBlocked]=useState(false);
+ const [failed,setFailed]=useState(false);
  useEffect(()=>{
   const backEl=backHost.current;if(!backEl)return;
   const policy=currentDevicePolicy();
   let base:THREE.WebGLRenderer;
   try{base=new THREE.WebGLRenderer({antialias:false,stencil:false,powerPreference:policy.constrained?'default':'high-performance'});}catch{queueMicrotask(()=>setFailed(true));return;}
   backEl.appendChild(base.domElement);
-  const video=document.createElement('video');player.current=video;
+  const video=document.createElement('video');
   video.muted=true;video.loop=true;video.playsInline=true;video.preload='auto';video.src='/assets/bad-apple-field.mp4';
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   // The source film is 24 fps; avoid rendering this decorative layer at 60-144 Hz.
@@ -168,7 +168,7 @@ export default function TideField({dive}:{dive?:RefObject<DiveState>}){
   let disposed=false,contextLost=false,loaded=false,frame=0,last=performance.now()-interval,wasStill=true,fieldScroll=0,dirty=true;
   let width=1,height=1,columns=0,rows=0,resizeTimer:ReturnType<typeof setTimeout>|undefined;
   let activeCard:HTMLElement|null=null,hoverPhase=1;
-  const play=()=>{if(disposed||contextLost||document.hidden)return;void video.play().then(()=>{if(!disposed)setBlocked(false);}).catch(()=>{if(!disposed)setBlocked(true);});};
+  const play=()=>{if(disposed||contextLost||document.hidden)return;void video.play().catch(()=>{});};
   const scheduleRender=()=>{if(!disposed&&!contextLost&&!document.hidden&&!frame)frame=requestAnimationFrame(render);};
   const requestRender=()=>{dirty=true;scheduleRender();};
   invalidate.current=requestRender;
@@ -390,7 +390,7 @@ export default function TideField({dive}:{dive?:RefObject<DiveState>}){
   base.domElement.addEventListener('webglcontextrestored',restored);
   const observer=new ResizeObserver(queueResize);observer.observe(backEl);resize();
   return()=>{disposed=true;page?.removeAttribute('data-render-quality');fieldObjects?.dispose();invalidate.current=()=>{};clearTimeout(resizeTimer);cancelAnimationFrame(frame);observer.disconnect();window.removeEventListener('pointermove',move);window.removeEventListener('focusin',focus);window.removeEventListener('scroll',requestRender);window.removeEventListener('portfolio-dive',onDive);
-   portraitImage.onload=null;portraitGeometry.dispose();portraitMaterial.dispose();document.removeEventListener('visibilitychange',visibility);reduced.removeEventListener('change',requestRender);video.removeEventListener('loadedmetadata',ready);video.removeEventListener('loadeddata',requestRender);video.removeEventListener('seeked',requestRender);video.removeEventListener('error',videoError);video.pause();video.removeAttribute('src');video.load();player.current=null;geometry.dispose();depthGeometry.dispose();veilGeometry.dispose();scaffoldGeometry.dispose();scaffoldMaterial.dispose();cageGeometry.dispose();cageMaterial.dispose();material.dispose();veilMaterial.dispose();glowTarget.dispose();glowCompositeMaterial.dispose();backgroundGeometry.dispose();backgroundMaterial.dispose();filmTexture.dispose();base.domElement.removeEventListener('webglcontextlost',lost);base.domElement.removeEventListener('webglcontextrestored',restored);base.dispose();base.forceContextLoss();base.domElement.remove();};
+   portraitImage.onload=null;portraitGeometry.dispose();portraitMaterial.dispose();document.removeEventListener('visibilitychange',visibility);reduced.removeEventListener('change',requestRender);video.removeEventListener('loadedmetadata',ready);video.removeEventListener('loadeddata',requestRender);video.removeEventListener('seeked',requestRender);video.removeEventListener('error',videoError);video.pause();video.removeAttribute('src');video.load();geometry.dispose();depthGeometry.dispose();veilGeometry.dispose();scaffoldGeometry.dispose();scaffoldMaterial.dispose();cageGeometry.dispose();cageMaterial.dispose();material.dispose();veilMaterial.dispose();glowTarget.dispose();glowCompositeMaterial.dispose();backgroundGeometry.dispose();backgroundMaterial.dispose();filmTexture.dispose();base.domElement.removeEventListener('webglcontextlost',lost);base.domElement.removeEventListener('webglcontextrestored',restored);base.dispose();base.forceContextLoss();base.domElement.remove();};
  },[dive]);
- return <><div ref={backHost} className="tide-back" aria-hidden="true"/>{blocked&&<button className="field-play" onClick={()=>{void player.current?.play().then(()=>setBlocked(false)).catch(()=>{});}}>Play the field</button>}{failed&&<p className="tide-error">The moving field couldn&apos;t load. Your introduction and projects are still available.</p>}</>;
+ return <><div ref={backHost} className="tide-back" aria-hidden="true"/>{failed&&<p className="tide-error">The moving field couldn&apos;t load. Your introduction and projects are still available.</p>}</>;
 }
