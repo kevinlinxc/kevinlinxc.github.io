@@ -321,8 +321,8 @@ export function createFieldObjects(){
   const anchor=new THREE.Group();documentSpace.add(anchor);
   return {anchor,mesh:null as THREE.Mesh|null,build,name,...motion};
  });
- const frustum=new THREE.Frustum(),projection=new THREE.Matrix4(),sphere=new THREE.Sphere();
- let width=1,height=1,ready=false,time=0,wasActive=false,lastPerspective=0;
+  const frustum=new THREE.Frustum(),projection=new THREE.Matrix4(),sphere=new THREE.Sphere();
+  let width=1,height=1,ready=false,time=0,wasActive=false,lastPerspective=0,external=0;
  const layout=()=>{
   const grid=document.querySelector<HTMLElement>('.project-grid');if(!grid)return;
   const cards=[...grid.querySelectorAll<HTMLElement>('[data-field-card]')];if(!cards.length){ready=false;return;}
@@ -338,11 +338,15 @@ export function createFieldObjects(){
    anchor.scale.setScalar(size*scale/modelSize);
   });ready=true;
  };
- return {
-  resize(w:number,h:number){width=w;height=h;lastPerspective=0;layout();},
-  layout,
-  render(renderer:THREE.WebGLRenderer,depth:DiveState|undefined,dt:number,reduced:boolean){
-   const amount=depth?.amount??0,active=amount>.01;
+  return {
+   resize(w:number,h:number){width=w;height=h;lastPerspective=0;layout();},
+   layout,
+   // External 3D content shares this scene, so it depth-sorts with the miniatures.
+   mount(object:THREE.Object3D){documentSpace.add(object);external++;},
+   unmount(object:THREE.Object3D){documentSpace.remove(object);external=Math.max(0,external-1);},
+   render(renderer:THREE.WebGLRenderer,depth:DiveState|undefined,dt:number,reduced:boolean){
+   // Keep rendering through the portrait's exit tail, when the camera amount has already returned to zero.
+   const amount=depth?.amount??0,active=amount>.01||(external>0&&(depth?.portrait??0)>.01);
    if(active&&!wasActive)layout();wasActive=active;
    if(!active||!ready)return;
    if(!reduced)time+=dt;
@@ -369,7 +373,8 @@ export function createFieldObjects(){
     mesh.rotation.set(tilt+Math.sin(time*.27+index)*.12,name==='Endurance'?phase+Math.sin(time*.18)*.35:time*spin+phase,name==='Endurance'?time*spin:Math.sin(time*.18+index)*.10);
     mesh.position.y=Math.sin(time*.5+index*2)*9/anchor.scale.x;
    });
-   if(visible){renderer.autoClear=false;renderer.clearDepth();renderer.render(scene,cameraView);renderer.autoClear=true;}
+   // Render when a miniature is in view, or whenever external content is mounted.
+   if(visible||external>0){renderer.autoClear=false;renderer.clearDepth();renderer.render(scene,cameraView);renderer.autoClear=true;}
   },
   dispose(){models.forEach(({mesh})=>mesh?.geometry.dispose());material.dispose();scene.clear();}
  };

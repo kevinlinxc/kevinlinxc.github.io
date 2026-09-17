@@ -108,44 +108,61 @@ const backgroundFragment=`varying vec2 vUv;${field}
 void main(){vec2 p=(vUv-.5)*vec2(uAspect,1.)*2.;float w=waves(p)*(1.-uCalm*.9)+probability(p);float f=(texture2D(uFilm,filmUV(p)).r-.5)*uReady*(1.-uCalm);float glow=exp(-abs(w+f*.2)*12.);vec3 c=vec3(.006,.014,.032)+vec3(.014,.026,.048)*glow; c+=vec3(.008,.014,.038)*smoothstep(-.3,.3,f);gl_FragColor=vec4(c,1.);}`;
 
 const portraitVertex = `
-attribute vec3 aColor,aScatter;
-attribute float aPhase;
-varying vec3 vColor;
+varying vec2 vUv;
 varying float vAlpha;
-uniform float uRatio,uPortrait,uPageScroll;
-uniform vec2 uPortraitCenter;
-${field}
-vec4 projectPortraitDepth(vec3 world,vec2 flatPosition,float dive){
- float yaw=uOrbit.x*1.335177*dive,pitch=-uOrbit.y*1.335177*dive;
- world.xz=mat2(cos(yaw),-sin(yaw),sin(yaw),cos(yaw))*world.xz;
- world.yz=mat2(cos(pitch),-sin(pitch),sin(pitch),cos(pitch))*world.yz;
- float distance=4.+uEntry*2.;
- float w=distance-world.z*dive;
- vec2 xy=mix(flatPosition*distance,world.xy*3.4,dive)/vec2(uAspect,1.);
- return vec4(xy,0.,w);
+uniform float uTime,uPortrait,uChannel;
+uniform vec2 uPortraitSize;
+uniform sampler2D uPortraitTex;
+float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453123);}
+float noise(vec2 p){
+ vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+ return mix(mix(hash(i),hash(i+vec2(1.,0.)),f.x),mix(hash(i+vec2(0.,1.)),hash(i+vec2(1.,1.)),f.x),f.y);
 }
+// Domain-warped fbm keeps folding the relief into new shapes instead of just sliding it.
+float relief(vec2 p,float phase){
+ vec2 q=vec2(noise(p+phase),noise(p+vec2(5.2,1.3)-phase));
+ return noise(p+1.8*q+vec2(3.7,8.1));
+}
+float luminance(vec2 p){return dot(texture2D(uPortraitTex,p).rgb,vec3(.299,.587,.114));}
 void main(){
- float t=clamp((uPortrait-.18-aPhase*.22)/.62,0.,1.);
- t=t*t*(3.-2.*t);
- float drift=sin(uTime*.6+aPhase*6.2831)*.018*t;
- vec2 base=uPortraitCenter+(position.xy-uPortraitCenter)*(1.+drift);
- float scrollOffset=uPageScroll*2.;
- vec2 home=base+vec2(0.,scrollOffset);
- vec3 world=mix(vec3(base,0.),vec3(uPortraitCenter,0.)+aScatter,t);
- world.y+=scrollOffset;
- gl_Position=projectPortraitDepth(world,home,uPortrait);
- vColor=aColor;
- vAlpha=smoothstep(.02,.18,uPortrait);
- gl_PointSize=(1.2+2.4*t)*uRatio*(1.+max(0.,world.z)*.2);
+ // Flat photo first, then the relief extrudes, so the motion reads as derived from the image.
+ // Flattening completes as the camera returns, so the relief never lingers in 2D.
+ float t=smoothstep(.5+uChannel*.03,.95+uChannel*.03,uPortrait);
+ float unit=uPortraitSize.x;
+ // The image supplies the height field: bright areas jut, and edges jut harder.
+ float height=luminance(uv),e=.006;
+ vec2 gradient=vec2(height-luminance(uv+vec2(e,0.)),height-luminance(uv+vec2(0.,e)));
+ float edge=clamp(length(gradient)*4.,0.,1.);
+ vec2 seed=vec2(uChannel*13.13,uChannel*7.77);
+ float field=relief(uv*3.6+seed,uTime*.22+uChannel*1.7);
+ float detail=relief(uv*8.4-seed,uTime*.34-uChannel*.9);
+ float lift=(height-.5)*1.5+edge*.6+(field-.55)*.45+(detail-.5)*.15;
+ // The smear follows the image's own gradients, with a little noise for the slow evolution.
+ vec2 warp=(gradient*1.1+(vec2(field,detail)-.55)*.22)*unit*t;
+ float sway=sin(uTime*.27+uChannel*2.1);
+ float depth=((uChannel-1.)*(.2+.07*sway)+lift*.3)*unit*t;
+ vec2 sized=position.xy*uPortraitSize*(1.+(uChannel-1.)*(.06+.025*sway)*t);
+ vec3 local=vec3(sized.x+warp.x,sized.y+warp.y,depth);
+ gl_Position=projectionMatrix*modelViewMatrix*vec4(local,1.);
+ vUv=uv;
+ vAlpha=smoothstep(.04,.24,uPortrait);
 }`;
 const portraitFragment = `
-varying vec3 vColor;
+uniform sampler2D uPortraitTex;
+uniform float uChannel;
+varying vec2 vUv;
 varying float vAlpha;
 void main(){
- float d=length(gl_PointCoord-.5);
- float a=1.-smoothstep(.14,.5,d);
- if(a<=.003)discard;
- gl_FragColor=vec4(vColor,a*vAlpha*.9);
+ vec2 centered=vUv-.5;
+ float radius=length(centered);
+ if(radius>.5)discard;
+ vec4 texel=texture2D(uPortraitTex,vUv);
+ vec3 tint=vec3(0.);
+ if(uChannel<.5)tint.r=texel.r;
+ else if(uChannel<1.5)tint.g=texel.g;
+ else tint.b=texel.b;
+ float edge=1.-smoothstep(.47,.5,radius);
+ gl_FragColor=vec4(tint,vAlpha*edge);
 }`;
 
 export default function TideField({dive}:{dive?:RefObject<DiveState>}){
@@ -177,16 +194,26 @@ export default function TideField({dive}:{dive?:RefObject<DiveState>}){
   video.addEventListener('loadedmetadata',ready);video.addEventListener('error',videoError);
   video.addEventListener('loadeddata',requestRender);video.addEventListener('seeked',requestRender);
   const filmTexture=new THREE.VideoTexture(video);filmTexture.minFilter=THREE.LinearFilter;filmTexture.magFilter=THREE.LinearFilter;
+  const portraitCanvas=document.createElement('canvas');portraitCanvas.width=1;portraitCanvas.height=1;
+  const portraitTexture=new THREE.CanvasTexture(portraitCanvas);portraitTexture.minFilter=THREE.LinearFilter;portraitTexture.magFilter=THREE.LinearFilter;portraitTexture.generateMipmaps=false;
   const uniforms={uTime:{value:0},uAspect:{value:1},uScroll:{value:0},uReady:{value:0},uCalm:{value:0},uStory:{value:0},uDive:{value:0},uEntry:{value:0},uOrbit:{value:new THREE.Vector2()},uCard:{value:new THREE.Vector4(8,8,.6,.4)},uResolve:{value:0},uPresence:{value:0},uPointer:{value:new THREE.Vector2()},uTypeCenter:{value:new THREE.Vector2()},uFilm:{value:filmTexture},uRatio:{value:1},uLayer:{value:0},uPortrait:{value:0},uPageScroll:{value:0},uPortraitCenter:{value:new THREE.Vector2()}};
   const frontUniforms={...uniforms,uLayer:{value:1}};
+  const portraitUniforms={...uniforms,uPortraitTex:{value:portraitTexture},uPortraitSize:{value:new THREE.Vector2()},uChannel:{value:0}};
   const camera=new THREE.Camera(),scene=new THREE.Scene();
+  // A transparent foreground canvas lets the shared 3D pass sort above the DOM project panels instead of behind them.
+  let fore:THREE.WebGLRenderer|null=null,foreLost=false,foreActive=false;
+  const foreEl=document.createElement('div');foreEl.className='tide-fore';foreEl.setAttribute('aria-hidden','true');(page??document.body).appendChild(foreEl);
+  try{
+   fore=new THREE.WebGLRenderer({alpha:true,antialias:false,stencil:false,powerPreference:policy.constrained?'default':'high-performance'});
+   fore.setClearColor(0x000000,0);foreEl.appendChild(fore.domElement);
+  }catch{fore=null;foreEl.remove();}
   let fieldObjects:ReturnType<typeof createFieldObjects>|undefined,objectsLoading=false;
   const prepareObjects=()=>{
    if(fieldObjects||objectsLoading||disposed)return;
    objectsLoading=true;
    void import('./FieldObjects').then(({createFieldObjects})=>{
     if(disposed)return;
-    fieldObjects=createFieldObjects();fieldObjects.resize(width,height);requestRender();
+    fieldObjects=createFieldObjects();fieldObjects.resize(width,height);fieldObjects.mount(portraitGroup);requestRender();
    }).catch(()=>{objectsLoading=false;});
   };
   const geometry=new THREE.BufferGeometry(),depthGeometry=new THREE.BufferGeometry(),veilGeometry=new THREE.BufferGeometry();
@@ -219,32 +246,18 @@ export default function TideField({dive}:{dive?:RefObject<DiveState>}){
    const background=new THREE.Mesh(backgroundGeometry,backgroundMaterial);background.frustumCulled=false;glowScene.add(background);
    const glowCompositeMaterial=new THREE.ShaderMaterial({uniforms:{uGlow:{value:glowTarget.texture}},vertexShader:backgroundVertex,fragmentShader:'uniform sampler2D uGlow; varying vec2 vUv; void main(){gl_FragColor=texture2D(uGlow,vUv);}',depthTest:false,depthWrite:false});
    const glowComposite=new THREE.Mesh(backgroundGeometry,glowCompositeMaterial);glowComposite.frustumCulled=false;scene.add(glowComposite);
-   const portraitGeometry=new THREE.BufferGeometry();
-   const portraitMaterial=new THREE.ShaderMaterial({uniforms,vertexShader:portraitVertex,fragmentShader:portraitFragment,transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending});
-   const portraitPoints=new THREE.Points(portraitGeometry,portraitMaterial);portraitPoints.frustumCulled=false;portraitPoints.renderOrder=3;portraitPoints.visible=false;scene.add(portraitPoints);
-   let portraitDiscX:Float32Array|null=null,portraitDiscY:Float32Array|null=null;
-   const portraitAnchor={x:0,y:0,rx:0,ry:0};
-   const applyAnchor=()=>{
-    if(!portraitDiscX||!portraitDiscY)return;
-    const count=portraitDiscX.length;
-    let attribute=portraitGeometry.getAttribute('position') as THREE.BufferAttribute|undefined;
-    if(!attribute){attribute=new THREE.BufferAttribute(new Float32Array(count*3),3);portraitGeometry.setAttribute('position',attribute);}
-    const positions=attribute.array;
-    for(let i=0;i<count;i++){positions[i*3]=portraitAnchor.x+portraitDiscX[i]*portraitAnchor.rx;positions[i*3+1]=portraitAnchor.y+portraitDiscY[i]*portraitAnchor.ry;positions[i*3+2]=0;}
-    // Reuse the VBO on each entry/resize; replacing the attribute stranded old buffers.
-    attribute.needsUpdate=true;
-    requestRender();
-   };
+   const portraitGeometry=new THREE.PlaneGeometry(1,1,policy.constrained?40:72,policy.constrained?40:72);
+   // DoubleSide so the relief stays visible as the camera orbits past it.
+   const portraitMaterials=[0,1,2].map(channel=>new THREE.ShaderMaterial({uniforms:{...portraitUniforms,uChannel:{value:channel}},vertexShader:portraitVertex,fragmentShader:portraitFragment,transparent:true,depthTest:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending}));
+   const portraitGroup=new THREE.Group();portraitGroup.frustumCulled=false;
+   const portraitLayers=portraitMaterials.map(material=>{const layer=new THREE.Mesh(portraitGeometry,material);layer.frustumCulled=false;layer.renderOrder=3;layer.visible=false;portraitGroup.add(layer);return layer;});
    const updateAnchor=()=>{
     const node=document.querySelector<HTMLElement>('.profile-intro .profile-portrait');if(!node)return;
-    const bounds=node.getBoundingClientRect(),aspect=uniforms.uAspect.value;
-    portraitAnchor.x=((bounds.left+bounds.width/2)/width*2-1)*aspect;
-    // Keep home and scatter in document space, independent of where 3D was entered.
-    portraitAnchor.y=1-(bounds.top+window.scrollY+bounds.height/2)/height*2;
-    portraitAnchor.rx=bounds.width/2*(2/width)*aspect;
-    portraitAnchor.ry=bounds.height/2*(2/height);
-    uniforms.uPortraitCenter.value.set(portraitAnchor.x,portraitAnchor.y);
-    applyAnchor();
+    const bounds=node.getBoundingClientRect();
+    // documentSpace already adds window.scrollY, so this keeps the relief pinned to the portrait in document space.
+    portraitGroup.position.set(bounds.left+bounds.width/2-width/2,height/2-(bounds.top+window.scrollY+bounds.height/2),0);
+    portraitUniforms.uPortraitSize.value.set(bounds.width,bounds.height);
+    requestRender();
    };
    const portraitImage=new Image();
    portraitImage.decoding='async';
@@ -252,31 +265,15 @@ export default function TideField({dive}:{dive?:RefObject<DiveState>}){
     if(disposed)return;
     const size=policy.constrained?256:512,imageWidth=portraitImage.naturalWidth,imageHeight=portraitImage.naturalHeight;
     if(!imageWidth||!imageHeight)return;
-    const sampleHeight=Math.round(size*imageHeight/imageWidth);
-    const canvas=document.createElement('canvas');canvas.width=size;canvas.height=sampleHeight;
+    const canvas=portraitCanvas;canvas.width=size;canvas.height=size;
     const context=canvas.getContext('2d');if(!context)return;
-    context.drawImage(portraitImage,0,0,size,sampleHeight);
-    const pixels=context.getImageData(0,0,size,sampleHeight).data;
-    const offsetY=(size-sampleHeight)/2,originX=size*.5,originY=size*.54,grid=policy.constrained?64:84;
-    const discX:number[]=[],discY:number[]=[],colors:number[]=[],scatter:number[]=[],phases:number[]=[];
-    for(let iy=0;iy<grid;iy++)for(let ix=0;ix<grid;ix++){
-     const gx=(ix/(grid-1))*2-1,gy=(iy/(grid-1))*2-1;
-     if(gx*gx+gy*gy>1)continue;
-     const qx=(gx*.5+.5)*size,qy=(gy*.5+.5)*size;
-     const sx=originX+(qx-originX)/1.5,sy=originY+(qy-originY)/1.5-offsetY;
-     if(sx<0||sy<0||sx>=size||sy>=sampleHeight)continue;
-     const index=(Math.floor(sy)*size+Math.floor(sx))*4;
-     colors.push(pixels[index]/255,pixels[index+1]/255,pixels[index+2]/255);
-     discX.push(gx);discY.push(gy);
-     const angle=Math.random()*Math.PI*2,spread=.25+Math.random()*1.1;
-     scatter.push(Math.cos(angle)*spread,Math.sin(angle)*spread,(Math.random()-.2)*1.6);
-     phases.push(Math.random());
-    }
-    portraitDiscX=new Float32Array(discX);portraitDiscY=new Float32Array(discY);
-    portraitGeometry.setAttribute('aColor',new THREE.Float32BufferAttribute(colors,3));
-    portraitGeometry.setAttribute('aScatter',new THREE.Float32BufferAttribute(scatter,3));
-    portraitGeometry.setAttribute('aPhase',new THREE.Float32BufferAttribute(phases,1));
-    updateAnchor();
+    // Reproduce the button's cover + scale(1.5) crop so the relief begins as the same picture.
+    const coverScale=Math.max(size/imageWidth,size/imageHeight),topOffset=(size-imageHeight*coverScale)/2;
+    const sourceSize=(2*size/3)/coverScale,sourceX=(size/6)/coverScale,sourceY=(.18*size-topOffset)/coverScale;
+    context.clearRect(0,0,size,size);
+    context.drawImage(portraitImage,sourceX,sourceY,sourceSize,sourceSize,0,0,size,size);
+    portraitTexture.needsUpdate=true;
+    requestRender();
    };
    let portraitRequested=false;
    const preparePortrait=()=>{if(!portraitRequested){portraitRequested=true;portraitImage.src='/assets/kevin-portrait-preview.webp';}};
@@ -290,6 +287,7 @@ export default function TideField({dive}:{dive?:RefObject<DiveState>}){
    glowTarget.setSize(Math.max(1,Math.ceil(w*ratio*profile.glowScale)),Math.max(1,Math.ceil(h*ratio*profile.glowScale)));
    // setDrawingBufferSize avoids allocating an intermediate old-size framebuffer.
    base.setDrawingBufferSize(w,h,ratio);uniforms.uRatio.value=ratio;uniforms.uAspect.value=w/h;
+   if(fore&&!foreLost)fore.setDrawingBufferSize(w,h,ratio);
    const nx=Math.max(2,Math.min(profile.columns,Math.round(w/profile.spacing))),ny=Math.max(2,Math.min(profile.rows,Math.round(h/profile.spacing)));
    if(nx!==columns||ny!==rows){
    columns=nx;rows=ny;
@@ -350,7 +348,8 @@ export default function TideField({dive}:{dive?:RefObject<DiveState>}){
    uniforms.uOrbit.value.set(depth?.x??0,depth?.y??0);
    const inDepth=uniforms.uDive.value>.001;
    // Portrait positions are in document coordinates; do not shade them far below home.
-   portraitPoints.visible=uniforms.uPortrait.value>.001&&Boolean(portraitDiscX)&&(!policy.touch||scroll<2.5);
+   const portraitVisible=uniforms.uPortrait.value>.001&&(!policy.touch||scroll<2.5);
+   portraitLayers.forEach(layer=>{layer.visible=portraitVisible;});
    if(inDepth){prepareObjects();if(!policy.touch||scroll<2.5)preparePortrait();}
    scaffold.visible=inDepth&&!depth?.exiting;
    dots.geometry=inDepth?depthGeometry:geometry;
@@ -368,7 +367,13 @@ export default function TideField({dive}:{dive?:RefObject<DiveState>}){
    uniforms.uTypeCenter.value.set(0,.25+Math.min(fieldScroll,1)*2.);
    base.setRenderTarget(glowTarget);base.render(glowScene,camera);base.setRenderTarget(null);
    base.render(scene,camera);
-   fieldObjects?.render(base,depth,dt,frozen);
+   const active3d=diveAmount>.001||portraitAmount>.001;
+   if(fore&&!foreLost){
+    // Only touch the overlay while 3D content is on screen, then clear it once on the way out.
+    if(active3d||foreActive){fore.clear();foreActive=active3d;}
+    if(active3d)fieldObjects?.render(fore,depth,dt,frozen);
+   }
+   else fieldObjects?.render(base,depth,dt,frozen);
    if(!frozen||diveAmount>0||portraitAmount>0)scheduleRender();
   }
   const visibility=()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;video.pause();wasStill=true;}else{quality.reset();last=performance.now()-interval;requestRender();}};
@@ -388,9 +393,13 @@ export default function TideField({dive}:{dive?:RefObject<DiveState>}){
   };
   base.domElement.addEventListener('webglcontextlost',lost);
   base.domElement.addEventListener('webglcontextrestored',restored);
+  const foreLostEvent=(event:Event)=>{event.preventDefault();foreLost=true;requestRender();};
+  const foreRestoredEvent=()=>{foreLost=false;last=performance.now()-interval;resize();requestRender();};
+  fore?.domElement.addEventListener('webglcontextlost',foreLostEvent);
+  fore?.domElement.addEventListener('webglcontextrestored',foreRestoredEvent);
   const observer=new ResizeObserver(queueResize);observer.observe(backEl);resize();
-  return()=>{disposed=true;page?.removeAttribute('data-render-quality');fieldObjects?.dispose();invalidate.current=()=>{};clearTimeout(resizeTimer);cancelAnimationFrame(frame);observer.disconnect();window.removeEventListener('pointermove',move);window.removeEventListener('focusin',focus);window.removeEventListener('scroll',requestRender);window.removeEventListener('portfolio-dive',onDive);
-   portraitImage.onload=null;portraitGeometry.dispose();portraitMaterial.dispose();document.removeEventListener('visibilitychange',visibility);reduced.removeEventListener('change',requestRender);video.removeEventListener('loadedmetadata',ready);video.removeEventListener('loadeddata',requestRender);video.removeEventListener('seeked',requestRender);video.removeEventListener('error',videoError);video.pause();video.removeAttribute('src');video.load();geometry.dispose();depthGeometry.dispose();veilGeometry.dispose();scaffoldGeometry.dispose();scaffoldMaterial.dispose();cageGeometry.dispose();cageMaterial.dispose();material.dispose();veilMaterial.dispose();glowTarget.dispose();glowCompositeMaterial.dispose();backgroundGeometry.dispose();backgroundMaterial.dispose();filmTexture.dispose();base.domElement.removeEventListener('webglcontextlost',lost);base.domElement.removeEventListener('webglcontextrestored',restored);base.dispose();base.forceContextLoss();base.domElement.remove();};
+  return()=>{disposed=true;page?.removeAttribute('data-render-quality');fieldObjects?.unmount(portraitGroup);fieldObjects?.dispose();invalidate.current=()=>{};clearTimeout(resizeTimer);cancelAnimationFrame(frame);observer.disconnect();window.removeEventListener('pointermove',move);window.removeEventListener('focusin',focus);window.removeEventListener('scroll',requestRender);window.removeEventListener('portfolio-dive',onDive);
+   portraitImage.onload=null;portraitGeometry.dispose();portraitMaterials.forEach(materialToDispose=>materialToDispose.dispose());portraitTexture.dispose();document.removeEventListener('visibilitychange',visibility);reduced.removeEventListener('change',requestRender);video.removeEventListener('loadedmetadata',ready);video.removeEventListener('loadeddata',requestRender);video.removeEventListener('seeked',requestRender);video.removeEventListener('error',videoError);video.pause();video.removeAttribute('src');video.load();geometry.dispose();depthGeometry.dispose();veilGeometry.dispose();scaffoldGeometry.dispose();scaffoldMaterial.dispose();cageGeometry.dispose();cageMaterial.dispose();material.dispose();veilMaterial.dispose();glowTarget.dispose();glowCompositeMaterial.dispose();backgroundGeometry.dispose();backgroundMaterial.dispose();filmTexture.dispose();base.domElement.removeEventListener('webglcontextlost',lost);base.domElement.removeEventListener('webglcontextrestored',restored);base.dispose();base.forceContextLoss();base.domElement.remove();fore?.domElement.removeEventListener('webglcontextlost',foreLostEvent);fore?.domElement.removeEventListener('webglcontextrestored',foreRestoredEvent);fore?.dispose();fore?.forceContextLoss();fore?.domElement.remove();foreEl.remove();};
  },[dive]);
  return <><div ref={backHost} className="tide-back" aria-hidden="true"/>{failed&&<p className="tide-error">The moving field couldn&apos;t load. Your introduction and projects are still available.</p>}</>;
 }

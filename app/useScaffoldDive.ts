@@ -117,7 +117,7 @@ export function useScaffoldDive(){
    style(scene,'perspective',`${reduced.matches?5000:1100-480*s.amount}px`);
    style(periphery,'--dive',s.amount.toFixed(3));
    style(periphery,'--dive-rush',String((s.entry*.8+Math.min(1,s.travel+s.speed)*.4)*strength));
-   copies.forEach((_,node)=>{style(node,'opacity',(node.classList.contains('profile-portrait')?1-smoothstep(.05,.42,s.portrait):1-s.amount).toFixed(3));});
+   copies.forEach((_,node)=>{style(node,'opacity',(node.classList.contains('profile-portrait')?1-smoothstep(.04,.24,s.portrait):1-s.amount).toFixed(3));});
    if(target||s.amount>0||s.portrait>0)frame=requestAnimationFrame(draw);
   };
   const wake=()=>{if(!frame){last=performance.now();frame=requestAnimationFrame(draw);}};

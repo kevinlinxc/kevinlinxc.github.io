@@ -82,6 +82,22 @@ a:focus-visible {
     z-index: 0
 }
 
+/* Foreground pass for the portrait relief: a separate transparent canvas so 3D content can sort above the DOM panels. */
+.tide-fore {
+    position: fixed;
+    inset: 0;
+    z-index: 11;
+    pointer-events: none;
+    /* Screen keeps the additive relief light on top of the panels instead of occluding them. */
+    mix-blend-mode: screen
+}
+
+.tide-fore canvas {
+    display: block;
+    width: 100%;
+    height: 100%
+}
+
 .tide-front {
     z-index: 3
 }
