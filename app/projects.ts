@@ -4,21 +4,21 @@ const projectEntries: Project[] = [
   {
     "name": "Bad Apple but it's Strava",
     "badApple": true,
-    "description": "(In Progress) Making Bad Apple but with Strava GPS data.",
-    "url": "https://www.instagram.com/reel/DcWgIfHJS_I/",
+    "description": "Making Bad Apple but with Strava GPS data.",
+    "url": "https://youtu.be/lW5FaiwU7UY?si=Fmj_0fOnxODYcW8t",
     "link": "Video",
     "image": "/assets/projects/bad-apple-strava.webp",
     "alt": "Bad Apple but it's Strava",
-    "note": "The repository will be public once the project is finished.",
+    "note": "A 2-year long project where I walked 190+ KM to draw Bad Apple with Strava Activities",
     "clips": [
       {
-        "name": "GitHub · private for now",
+        "name": "GitHub",
         "url": "https://github.com/kevinlinxc/badapple-strava"
       }
     ],
     "date": {
-      "label": "In progress",
-      "sort": 99999999
+      "label": "2025-2026",
+      "sort": 20261118
     }
   },
   {
