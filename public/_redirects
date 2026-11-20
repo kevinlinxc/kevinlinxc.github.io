@@ -1,0 +1,3 @@
+/logbooks /writing/ 301
+/logbooks/ /writing/ 301
+/logbooks/* /writing/:splat 301
